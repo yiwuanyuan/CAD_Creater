@@ -5,6 +5,8 @@
 # Date  : 2019-1-4
 from re import match,sub
 from pandas import read_excel,DataFrame
+import openpyxl
+from openpyxl.styles import Font, colors
 class InfoPro:
 
     def __init__(self,addr):
@@ -12,6 +14,7 @@ class InfoPro:
         self.addr = addr
         df = read_excel(addr, skipfooter= 1)
         cal = 0
+        line_len = len(df.values)
         for line in reversed(df.values):
             form_out = {}
             # 对应excel中的通径

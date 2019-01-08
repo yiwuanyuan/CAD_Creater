@@ -6,11 +6,10 @@
 
 from pandas import read_excel
 
-from os import getcwd,mkdir,path,chdir
-from glob import glob
-from str2map import *
+from os import getcwd
 from InfoPro import *
-from re import split,match,sub
+from re import match
+from str2map import *
 dirc =getcwd()
 global table_finish,table_result
 
@@ -21,24 +20,14 @@ class GetExcelInfo:
         # 设定输出到下料清单的数据
         self.docx_list = []
         self.output = []
-        # # address =glob('*排料清单.xlsx')[-1]  #默认查找文件夹下名字以排料清单结尾的xlsx文件
-        # # excel_position = glob(address +'\*排料清单.xlsx')[-1]
-        # if glob(address +'\*排料清单.xlsx'):
-        #     excel_position = glob(address +'\*排料清单.xlsx')[-1]
-        # elif glob(dirc +'\*排料清单.xlsx'):
-        #     excel_position = glob(dirc + '\*排料清单.xlsx')[-1]
-        # else:
-        #     print('当前目录和目标目录均无排料清单')
-        #
-        # print(excel_position)
-        # df = read_excel(excel_position,skiprows=1)
         # bellows_weight_1219 = 0
         # bellows_weight_1000 = 0
-        # print(df.values[0])
-        print(address)
-        inform  = InfoPro(address).form_out
 
-        # for line in df.values:
+        #判断模板Excel的类型
+        if address.find('排料清单')!=-1:
+            inform = read_excel(address,skiprows=1).values
+        else:
+            inform  = InfoPro(address).form_out
         for line in inform:
             docx_input = {}
             format_input = {}
@@ -58,8 +47,8 @@ class GetExcelInfo:
                 docx_input['part_name'] = line[3]
                 docx_input['metertial'] = str(line[4])
                 docx_input['thickness'] = line[5]
-
-                if line[7] == 0 or line[7] != line[7] :
+                print(type(line[7]))
+                if line[7] != line[7] or line[7] ==0 or type(line[7]) == str :
                     format_input['type']='整圆'
                     format_input['parameter'].append(line[6])
                     docx_input['size'] = '直径: ' + str(line[6])
@@ -68,7 +57,7 @@ class GetExcelInfo:
                     line[6] = (line[6]- line[5])*3.1415926
                     format_input['parameter'].append(line[6])
                     docx_input['size'] = '展开长: ' + str(int(line[6])+1) + ' 宽度: ' +str(line[7])
-                elif line[3].find("环")!= -1 or line[3].find("A板")!= -1 or (str(line[6]).find("径")!= -1 and str(line[7]).find("径")!= -1):
+                elif line[3].find("环")!= -1 or line[3].find("B板")!= -1 or (str(line[6]).find("径")!= -1 and str(line[7]).find("径")!= -1):
                     format_input['type'] = '圆环'
                     docx_input['size'] = '外直径: ' + str(line[6]) + ' 内直径: ' + str(line[7])
                     format_input['parameter'].append(line[6])
