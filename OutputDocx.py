@@ -16,6 +16,7 @@ import time
 from os import getcwd,path,chdir
 from glob import glob
 
+#改写成一个类
 def OutputDocx(address = dirc):
     chdir(address)
     GetExcelInfo(address)
@@ -133,5 +134,4 @@ def OutputDocx(address = dirc):
     #文件保存
     doc.save(address +'\\' + table_title + u'_结构件下料清单.docx')
     table_finish = '文件已生成'
-
     print(table_finish)

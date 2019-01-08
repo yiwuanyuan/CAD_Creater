@@ -22,7 +22,7 @@ class Str2map:
             self.thickness = bellows[-2]
             self.num =int( bellows[-3])
 
-            # #波纹管重量计算 如果波纹管材料_纵向展开过短将产生dxf文件
+            #波纹管重量计算 如果波纹管材料_纵向展开过短将产生dxf文件
             # if  format_input['parameter'][1] > 1219:
             #     bellows_weight_1219 = format_input['parameter'][0] * format_input['parameter'][1] * bellows[-2] * 0.00000785 * format_input['sum'] + bellows_weight_1219
             # elif 950 < format_input['parameter'][1] < 1219 :
@@ -37,7 +37,7 @@ class Str2map:
             self.parameter = []
             pipe = []
             for i in split('[*-]',sub('^[A-Za-z]*','',str).strip('-')):#用re.split可以分割多个分割符
-                pipe.append(float(i))  #接管参数汇总
+                pipe.append(float(i.strip('°')))  #接管参数汇总
             self.parameter.append((pipe[0] - pipe[1]) * 3.1415926)
             self.parameter.append(pipe[2])
             self.thickness = int(pipe[1])

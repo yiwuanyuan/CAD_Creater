@@ -44,11 +44,12 @@ def gui_creator():
         if  path.get():
             addr = path.get().strip('(').strip(')').split(',')
             for ad in addr:
-                # bd = ad.replace('/','\\')
-                g = GetExcelInfo(ad)
-                for i in g.output:
-                    print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'])
-                    DrawCreator(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], address=addr)
+                if ad!= '':
+                    g = GetExcelInfo(ad.strip().strip('\''))
+                    doc_addr = '/'.join(ad.strip().strip('\'').split('/')[:-1])
+                    for i in g.output:
+                        print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'],)
+                        DrawCreator(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], address=doc_addr)
         else:
             messagebox.showinfo(title='提示', message='至少选择一个Excel文件')
 
@@ -63,19 +64,14 @@ def gui_creator():
     #     # for i in o.output:
     #     # result5.set('文件已生成')
 
-
-
     tk.Label(f2, text="目标路径:").pack()
     path = tk.StringVar()
     tk.Entry(f2, textvariable = path).pack()
-
 
     tk.Button(f2,text='选择文件所在位置',command=sel_doc).pack()
     # tk.Button(f2,text='选择文件夹所在位置',command=sel_doc).pack()
     tk.Button(w,text='一键生成dxf数据',command=let_work).pack()
     # tk.Button(w,text='一键生成下料清单',command=let_docx_work).pack() #暂时不更新
-
-
 
     w.mainloop()
 

@@ -61,10 +61,12 @@ class GetExcelInfo:
 
                 if line[7] == 0 or line[7] != line[7] :
                     format_input['type']='整圆'
+                    format_input['parameter'].append(line[6])
                     docx_input['size'] = '直径: ' + str(line[6])
                 elif line[3].find("接管") != -1 or (str(line[6]).find("径")!= -1 and str(line[7]).find("径")== -1):
                     format_input['type']='接管'
                     line[6] = (line[6]- line[5])*3.1415926
+                    format_input['parameter'].append(line[6])
                     docx_input['size'] = '展开长: ' + str(int(line[6])+1) + ' 宽度: ' +str(line[7])
                 elif line[3].find("环")!= -1 or line[3].find("A板")!= -1 or (str(line[6]).find("径")!= -1 and str(line[7]).find("径")!= -1):
                     format_input['type'] = '圆环'
@@ -92,8 +94,7 @@ class GetExcelInfo:
                     docx_input['sum'] =format_input['sum'] =int(line[9])
                 # print(line[0])
                 format_input['name']=str(line[0]) + '_' + line[1] + '_' + line[3]+ '_' +str(format_input['sum'])
-                #绘制图形
-                # DrawCreator(format_input['name'], format_input['type'], format_input['parameter'],format_input['material'],format_input['thickness'],address)
+
                 self.docx_list.append(docx_input)
             self.output.append(format_input)
     # # 波纹管板材简算
@@ -109,8 +110,3 @@ class GetExcelInfo:
     #     estimate_1219 = '均使用板幅1219所需重量:%d kg' %(bellows_weight_1000*1.22+bellows_weight_1219)
     #     print(estimate_1219)
 #
-# g = GetExcelInfo()
-# print(g.docx_list)
-#
-# df = DataFrame(g.docx_list)
-# df.to_excel('test1.xlsx')

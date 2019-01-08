@@ -38,4 +38,5 @@ def DrawCreator(name,type,parameter,material,thickness=0,address =dirc):
             #如果文件夹不存在创建
             mkdir(address + '//' + '材料_' + material + '_厚度_' + str(thickness))
     chdir(address + '\\材料_' + material + '_厚度_'+str(thickness))
+
     drawing.save()

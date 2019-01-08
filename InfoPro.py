@@ -3,9 +3,8 @@
 # File  : InfoPro.py
 # Author: Wangyuan
 # Date  : 2019-1-4
-from re import split,match,sub
+from re import match,sub
 from pandas import read_excel,DataFrame
-# addr = 'MM-2108  0-0.xlsx'
 class InfoPro:
 
     def __init__(self,addr):
@@ -16,11 +15,11 @@ class InfoPro:
         for line in reversed(df.values):
             form_out = {}
             # 对应excel中的通径
-            form_out[1] = addr.split(' ')[0]
+            form_out[1] = addr.split('/')[-1].split(' ')[0]
             # 对应excel中的件数
             form_out[2] = 1
             # 对应excel中的零件名称
-            form_out[3] = line[2]
+            form_out[3] = sub('\*','X',line[2])
             # 对应excel中的数量
             form_out[9]= line[7]
             # 对应excel中的材料
@@ -45,7 +44,3 @@ class InfoPro:
     def to_excel(self):
         df = DataFrame(self.form_out)
         df.to_excel('重整化'+self.addr)
-# i = InfoPro(addr)
-# i.to_excel()
-# # # # for line in i.form_out:
-# # # #     print(line)
