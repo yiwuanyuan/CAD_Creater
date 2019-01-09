@@ -11,6 +11,7 @@ class InfoPro:
 
     def __init__(self,addr):
         self.form_out = []
+        self.omit_value = []
         self.addr = addr
         df = read_excel(addr, skipfooter= 1)
         cal = 0
@@ -31,7 +32,7 @@ class InfoPro:
             form_out[8] = 1
             if line[1] == line[1]:
                 if line[5] == line[5] and line[6] == line[6]:
-                    cal += 1;
+                    cal += 1
                     form_out[0] = cal
                     form_out[6] = line[5]
                     form_out[7]= line[6]
@@ -44,6 +45,17 @@ class InfoPro:
                     form_out[7] = 0
                     form_out[5] = 0
                     self.form_out.append(form_out)
+                else:
+                    omit_value = []
+                    for i in range(len(line)):
+                        omit_value.append(line[i])
+                    self.omit_value.append(omit_value)
+
     def to_excel(self):
         df = DataFrame(self.form_out)
         df.to_excel('重整化'+self.addr)
+
+i = InfoPro('MM-2108  0-0.xlsx')
+
+# print(i.form_out)
+print(i.omit_value)
