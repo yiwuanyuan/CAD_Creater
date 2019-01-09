@@ -20,3 +20,5 @@
     2.修复一些BUG
 0.8
     1.修复一重要BUG，
+github 命令
+git push -u origin master
