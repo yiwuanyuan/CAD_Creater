@@ -17,14 +17,17 @@ from os import getcwd,path,chdir
 from glob import glob
 
 #改写成一个类
-def OutputDocx(address = dirc):
-    chdir(address)
-    GetExcelInfo(address)
-    chdir(address)
-    doc = Document(docx=path.join(getcwd(), 'default.docx'))
-    # doc = Document()
-    print(dirc)
-    table_title = str(glob('*排料清单.xlsx')[-1].split('_')[0].split('-')[0].split(' ')[0])
+def OutputDocx(info,address):
+    addr = '/'.join(address.strip().strip('\'').split('/')[:-1])
+    chdir(addr)
+    # doc = Document(docx=path.join(getcwd(), 'default.docx'))
+    doc = Document()
+    if address.find('排料清单') != -1:
+        table_title = str(address.split('\\')[-1].split('/')[-1].split('_')[0].split('-')[0].split(' ')[0])
+    else:
+        table_title = str(address.split('\\')[-1].split('/')[-1].split(' ')[0])
+
+
     #设置全局字体
     doc.styles['Normal'].font.name = u'宋体'
     doc.styles['Normal']._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
@@ -46,7 +49,7 @@ def OutputDocx(address = dirc):
 
     #添加内容，绘制表头
     title_list = [r'序号',r'产品代号', r'零件名称', r'材料',u'厚度',u'下料净尺寸(mm)',u'数量',r'备注']
-    trow = len(docx_list) + 2
+    trow = len(info) + 2
     tcol = len(title_list)
     table = doc.add_table(rows=trow, cols=tcol, style='Table Grid')
     table.cell(0,0).merge(table.cell(0,tcol-1))  #合并第一行
@@ -84,19 +87,28 @@ def OutputDocx(address = dirc):
         table.cell(1, i).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         run_1.style = tbhead
     # 设置表格内容及对其方式
-    for y , list in enumerate(docx_list):
+    y = 0
+    for list in info:
         x = 1
+        #设置每一行第一个单元格的数值
         table.cell(y + 2, 0).text = str(y+1)
-        table_result ='数据已处理: '+str(int((y+1)/len(docx_list) *100 ))+ '%'
-
+        table_result ='数据已处理: '+str(int((y+1)/len(info) *100 ))+ '%'
         print(table_result)
+
         table.cell(y + 2, 0).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(y + 2, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        for content in list.values():
-            table.cell(y + 2, x).text = str(content)
+        #设置每一行的单元格的内容
+        table.cell(y + 2, 1).text = str(list['product_code'])
+        table.cell(y + 2, 2).text = str(list['part_name'])
+        table.cell(y + 2, 3).text = str(list['material'])
+        table.cell(y + 2, 4).text = str(list['thickness'])
+        table.cell(y + 2, 5).text = str(list['size'])
+        table.cell(y + 2, 6).text = str(list['sum'])
+        for x in range(len(list)):
             table.cell(y + 2, x).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(y + 2, x).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-            x += 1
+
+        y += 1
     print('数据已处理完毕，请耐心等待')
     #设置列宽
     table.autofit = False
@@ -132,6 +144,6 @@ def OutputDocx(address = dirc):
     doc.sections[0].top_margin = Mm(18)
     doc.sections[0].bottom_margin = Mm(15)
     #文件保存
-    doc.save(address +'\\' + table_title + u'_结构件下料清单.docx')
+    doc.save(addr +'\\' + table_title + u'_结构件下料清单.docx')
     table_finish = '文件已生成'
     print(table_finish)

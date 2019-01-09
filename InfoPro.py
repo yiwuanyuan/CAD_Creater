@@ -5,8 +5,6 @@
 # Date  : 2019-1-4
 from re import match,sub
 from pandas import read_excel,DataFrame
-import openpyxl
-from openpyxl.styles import Font, colors
 class InfoPro:
 
     def __init__(self,addr):
@@ -55,7 +53,7 @@ class InfoPro:
         df = DataFrame(self.form_out)
         df.to_excel('重整化'+self.addr)
 
-i = InfoPro('MM-2108  0-0.xlsx')
-
-# print(i.form_out)
-print(i.omit_value)
+# i = InfoPro('MM-2108  0-0.xlsx')
+#
+# # print(i.form_out)
+# print(i.omit_value)

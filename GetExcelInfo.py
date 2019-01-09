@@ -38,16 +38,45 @@ class GetExcelInfo:
                 format_input['type'] =b.type
                 format_input['thickness'] = b.thickness
                 format_input['material'] = str(line[4])
-                format_input['sum'] = int(b.num*line[2]*line[8])
+                #如果是波纹管就只修改数量
+                if format_input['type'] == '波纹管':
+                    format_input['sum'] = int(b.num * line[2] * line[8])
+                #如果是其他类型的零件就将文件输出
+                else:
+
+                    docx_input['product_code'] = line[1]
+                    docx_input['part_name'] = line[3]
+                    docx_input['thickness'] = format_input['thickness']
+                    docx_input['material'] = format_input['material']
+                    if line[9] != line[2] * line[8]:
+                        if line[9] != line[9]:
+                            docx_input['sum'] = format_input['sum'] = int(line[2] * line[8])
+                        else:
+                            docx_input['sum'] = format_input['sum'] = int(line[9])
+                            print('请检查%s行数据是否异常' % line[0])
+                    else:
+                        docx_input['sum'] = format_input['sum'] = int(line[9])
+                    #单纯的为了之后代码简单
+                    p1 = format_input['parameter'][0]
+                    p2 = format_input['parameter'][1]
+                    if format_input['type'] == '整圆':
+                        docx_input['size'] = '直径: ' + str(p1)
+                    elif format_input['type'] == '接管':
+                        docx_input['size'] = '展开长: ' + str(int(p1) + 1) + ' 宽度: ' + str(p2)
+                    elif format_input['type'] == '圆环':
+                        docx_input['size'] = '外直径: ' + str(p1) + ' 内直径: ' + str(p2)
+                    else:
+                        docx_input['size'] = '长度: ' + str(int(p1) + 1) + ' 宽度: ' + str(p2)
+                    self.docx_list.append(docx_input)
                 format_input['name'] = str(line[0]) + '_' + line[1] + '_' + line[3] + '_' + str(format_input['sum'])
+
             else:
                 # 判断除以号代图外的其他输入类型
                 # 初始化下清单的参数
                 docx_input['product_code'] = line[1]
                 docx_input['part_name'] = line[3]
-                docx_input['metertial'] = str(line[4])
+                docx_input['material'] = str(line[4])
                 docx_input['thickness'] = line[5]
-                print(type(line[7]))
                 if line[7] != line[7] or line[7] ==0 or type(line[7]) == str :
                     format_input['type']='整圆'
                     format_input['parameter'].append(line[6])
@@ -78,12 +107,12 @@ class GetExcelInfo:
                     if line[9] != line[9]:
                         docx_input['sum'] = format_input['sum'] =int(line[2] * line[8])
                     else:
+                        docx_input['sum'] = format_input['sum'] = int(line[9])
                         print('请检查%s行数据是否异常'%line[0])
                 else:
                     docx_input['sum'] =format_input['sum'] =int(line[9])
                 # print(line[0])
                 format_input['name']=str(line[0]) + '_' + line[1] + '_' + line[3]+ '_' +str(format_input['sum'])
-
                 self.docx_list.append(docx_input)
             self.output.append(format_input)
     # # 波纹管板材简算
