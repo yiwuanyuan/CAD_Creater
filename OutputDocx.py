@@ -104,7 +104,7 @@ def OutputDocx(info,address):
         table.cell(y + 2, 4).text = str(list['thickness'])
         table.cell(y + 2, 5).text = str(list['size'])
         table.cell(y + 2, 6).text = str(list['sum'])
-        for x in range(len(list)):
+        for x in range(tcol):
             table.cell(y + 2, x).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
             table.cell(y + 2, x).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
