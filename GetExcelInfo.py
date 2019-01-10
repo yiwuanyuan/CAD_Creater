@@ -8,8 +8,9 @@ from pandas import read_excel
 
 from os import getcwd
 from InfoPro import *
-from re import match
+from re import match,findall
 from str2map import *
+import math
 dirc =getcwd()
 global table_finish,table_result
 
@@ -31,90 +32,159 @@ class GetExcelInfo:
         for line in inform:
             docx_input = {}
             format_input = {}
-            format_input['parameter'] = []
-            if match('^[a-zA-Z]',str(line[6])):  #如果列6是以号代图,则识别以号代图
-                b = Str2map(line[6])
+            format_input['parameter'] = {}
+
+            list_num = line[0]
+            pro_name = line[1]
+            pro_sum  = line[2]
+            part_name = line[3]
+            material = line[4]
+            thickness = line[5]
+            p1 = line[6]
+            # 长度、外径、环板外直径、以号代图
+            p2 = line[7]
+            # 宽度、接管长、环板内直径
+            sum_num = int(line[8])
+            mark_sum = line[9]
+            remark = line[10]
+
+            if findall('\*', str(p1)):  #如果列6是以号代图,则识别以号代图
+                b = Str2map(p1)
                 format_input['parameter'] =b.parameter
                 format_input['type'] =b.type
                 format_input['thickness'] = b.thickness
-                format_input['material'] = str(line[4])
+                format_input['material'] = str(material)
                 #如果是波纹管就只修改数量
                 if format_input['type'] == '波纹管':
-                    format_input['sum'] = int(b.num * line[2] * line[8])
+                    format_input['sum'] = int(b.num * pro_sum * sum_num)
                 #如果是其他类型的零件就将文件输出
                 else:
 
-                    docx_input['product_code'] = line[1]
-                    docx_input['part_name'] = line[3]
+                    docx_input['product_code'] = pro_name
+                    docx_input['part_name'] = part_name
                     docx_input['thickness'] = format_input['thickness']
                     docx_input['material'] = format_input['material']
-                    if line[9] != line[2] * line[8]:
-                        if line[9] != line[9]:
-                            docx_input['sum'] = format_input['sum'] = int(line[2] * line[8])
+                    if mark_sum != pro_sum * sum_num:
+                        if mark_sum != mark_sum:
+                            docx_input['sum'] = format_input['sum'] = int(pro_sum * sum_num)
                         else:
-                            docx_input['sum'] = format_input['sum'] = int(line[9])
-                            print('请检查%s行数据是否异常' % line[0])
+                            docx_input['sum'] = format_input['sum'] = int(mark_sum)
+                            # print('请检查%s行数据是否异常' % list_num)
                     else:
-                        docx_input['sum'] = format_input['sum'] = int(line[9])
+                        docx_input['sum'] = format_input['sum'] = int(mark_sum)
                     #单纯的为了之后代码简单
-                    p1 = format_input['parameter'][0]
-                    p2 = format_input['parameter'][1]
+                    para1 = format_input['parameter'][0]
+                    para2 = format_input['parameter'][1]
                     if format_input['type'] == '整圆':
-                        docx_input['size'] = '直径: ' + str(p1)
+                        docx_input['size'] = '直径: ' + str(para1)
                     elif format_input['type'] == '接管':
-                        docx_input['size'] = '展开长: ' + str(int(p1) + 1) + ' 宽度: ' + str(p2)
+                        docx_input['size'] = '展开长: ' + str(int(para1) + 1) + ' 宽度: ' + str(para2)
                     elif format_input['type'] == '圆环':
-                        docx_input['size'] = '外直径: ' + str(p1) + ' 内直径: ' + str(p2)
+                        docx_input['size'] = '外直径: ' + str(para1) + ' 内直径: ' + str(para2)
                     else:
-                        docx_input['size'] = '长度: ' + str(int(p1) + 1) + ' 宽度: ' + str(p2)
+                        docx_input['size'] = '长度: ' + str(int(para1) + 1) + ' 宽度: ' + str(para2)
                     self.docx_list.append(docx_input)
-                format_input['name'] = str(line[0]) + '_' + line[1] + '_' + line[3] + '_' + str(format_input['sum'])
+                format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(format_input['sum'])
 
             else:
                 # 判断除以号代图外的其他输入类型
                 # 初始化下清单的参数
-                docx_input['product_code'] = line[1]
-                docx_input['part_name'] = line[3]
-                docx_input['material'] = str(line[4])
-                docx_input['thickness'] = line[5]
-                if line[7] != line[7] or line[7] ==0 or type(line[7]) == str :
+                docx_input['product_code'] = pro_name
+                docx_input['part_name'] = part_name
+                docx_input['material'] = str(material)
+                docx_input['thickness'] = thickness
+                if p2 != p2 or p2 ==0 or type(p2) == str :
+                    # 内直径为空
                     format_input['type']='整圆'
-                    format_input['parameter'].append(line[6])
-                    docx_input['size'] = '直径: ' + str(line[6])
-                elif line[3].find("接管") != -1 or (str(line[6]).find("径")!= -1 and str(line[7]).find("径")== -1):
+                    format_input['parameter'].update({'od': p1})
+                    docx_input['size'] = '直径: ' + str(p1)
+
+                elif part_name.find("接管") != -1 or (str(p1).find("径")!= -1 and str(p2).find("径")== -1):
                     format_input['type']='接管'
-                    line[6] = (line[6]- line[5])*3.1415926
-                    format_input['parameter'].append(line[6])
-                    docx_input['size'] = '展开长: ' + str(int(line[6])+1) + ' 宽度: ' +str(line[7])
-                elif line[3].find("环")!= -1 or line[3].find("B板")!= -1 or (str(line[6]).find("径")!= -1 and str(line[7]).find("径")!= -1):
+                    format_input['parameter'].update({'l': (p1 - thickness) * 3.1415926})
+                    docx_input['size'] = '展开长: ' + str(int(p1)+1) + ' 宽度: ' +str(p2)
+                    #判断是否拼接
+                    if str(remark).find('拼') == -1:
+                        format_input['parameter'].update({'w': p2})
+                        docx_input['size'] = '展开长: ' + str(int(p1) + 1) + ' 宽度: ' + str(p2)
+                    else:
+                        weld_part=[]
+                        for i in findall('[^\d]*(\d+)\.?[^\d]*',remark):
+                            weld_part.append(i)
+                        format_input['ping']=[]
+                        for i in range(len(weld_part)):
+                            p={}
+                            p['parameter']={}
+                            p['parameter'].update({'l': (p1-thickness)*3.1415926})
+                            p['parameter'].update({'w': weld_part[i]})
+                            p['type'] = '接管'
+                            p['thickness'] = thickness
+                            p['material'] = str(material)
+                            p['sum'] = sum_num
+                            p['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(sum_num)+'第'+str(i+1)+'拼，共'+str(len(weld_part))+'拼'
+                            format_input['ping'].append(p)
+
+                elif part_name.find("环")!= -1 or part_name.find("B板")!= -1 or (str(p1).find("径")!= -1 and str(p2).find("径")!= -1) or (str(p1).find("φ")!= -1 and str(p2).find("φ")!= -1):
+
                     format_input['type'] = '圆环'
-                    docx_input['size'] = '外直径: ' + str(line[6]) + ' 内直径: ' + str(line[7])
-                    format_input['parameter'].append(line[6])
+                    docx_input['size'] = '外直径: ' + str(p1) + ' 内直径: ' + str(p2)
+                    format_input['parameter'].update({'od': p1})
+                    format_input['parameter'].update({'id': p2})
+                    if str(remark).find('拼') != -1:
+                        for i in findall('[^\d]*(\d+)[^\d]*', remark):
+                            degree = 360/int(i[0])
+                            sum_num *= int(i[0])
+                        format_input['parameter'].update({'angle': degree})
+                #判断是否为弧板
+                elif part_name.find('弧')!=-1:
+                    format_input['type'] = '弧板'
+
+                    if float(thickness)<=80:
+                        format_input['parameter'].update({'od': (p1 + p2)*2})
+                        format_input['parameter'].update({'id': p1*2})
+                        format_input['parameter'].update({'angle': float(findall('[^\d]*(\d+)\.?[^\d]*',remark)[0])})
+                    else:
+                        format_input['parameter'].update({'l': (p1*2 + p2)*3.1415926})
+                        n=sum_num/math.floor(360/float(findall('[^\d]*(\d+)\.?[^\d]*',remark)[0]))
+                        format_input['parameter'].update({'w': thickness*n})
+                        thickness=p2
+                        sum_num=1
+
                 else:
-                    format_input['type'] ='搭板'
-                    format_input['parameter'].append(line[6])
-                    docx_input['size'] = '长度: ' + str(int(line[6]) + 1) + ' 宽度: ' + str(line[7])
+                    format_input['type'] = '搭板'
+                    format_input['parameter'].update({'w': p1})
+                    format_input['parameter'].update({'l': p2})
+                    docx_input['size'] = '长度: ' + str(int(p1) + 1) + ' 宽度: ' + str(p2)
 
                 #除波纹管外的其他的类型提供parameter参数和name参数
-                if type(line[7]) == int or type(line[6]) == float:
-                    if line[7] != 0:
-                        format_input['parameter'].append(line[7])
+                # if type(p2) == int or type(p1) == float:
+                #     if p2 != 0:
+                #         format_input['parameter'].append(p2)
 
-                docx_input['thickness'] = format_input['thickness'] = line[5]
-                format_input['material'] = str(line[4])
-                format_input['sum'] = line[9]
-                if line[9] != line[2]*line[8]:
-                    if line[9] != line[9]:
-                        docx_input['sum'] = format_input['sum'] =int(line[2] * line[8])
+                docx_input['thickness'] = format_input['thickness'] = thickness
+                format_input['material'] = str(material)
+                format_input['sum'] = mark_sum
+                if mark_sum != pro_sum*sum_num:
+                    if mark_sum != mark_sum:
+                        docx_input['sum'] = format_input['sum'] =int(pro_sum * sum_num)
                     else:
-                        docx_input['sum'] = format_input['sum'] = int(line[9])
-                        print('请检查%s行数据是否异常'%line[0])
+                        docx_input['sum'] = format_input['sum'] = int(mark_sum)
+                        # print('请检查%s行数据是否异常'%list_num)
                 else:
-                    docx_input['sum'] =format_input['sum'] =int(line[9])
-                # print(line[0])
-                format_input['name']=str(line[0]) + '_' + line[1] + '_' + line[3]+ '_' +str(format_input['sum'])
+                    docx_input['sum'] =format_input['sum'] =int(mark_sum)
+                # print(list_num)
+                format_input['name']=str(list_num) + '_' + pro_name + '_' + part_name+ '_' +str(format_input['sum'])
                 self.docx_list.append(docx_input)
-            self.output.append(format_input)
+            if 'ping' in format_input:
+                for i in format_input['ping']:
+                    self.output.append(i)
+                    print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], i['sum'])
+            else:
+                self.output.append(format_input)
+                print(format_input['name'], format_input['type'], format_input['parameter'],
+                          format_input['material'], format_input['thickness'], format_input['sum'])
+        for i in self.output:
+            print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], i['sum'])
     # # 波纹管板材简算
     # global result_success,result_1219,result_1000,estimate_1219
     # result_success = '所有图形均已绘制完毕~'
@@ -127,4 +197,5 @@ class GetExcelInfo:
     #     print(result_1000)
     #     estimate_1219 = '均使用板幅1219所需重量:%d kg' %(bellows_weight_1000*1.22+bellows_weight_1219)
     #     print(estimate_1219)
-#
+
+g = GetExcelInfo('C:/Users/wang&shao/Documents/WeChat Files/yuan598224009/Files/V2/MM-2108  0-0.xlsx')

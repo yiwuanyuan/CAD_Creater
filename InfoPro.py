@@ -28,6 +28,7 @@ class InfoPro:
             form_out[4] = line[3]
             # 对应excel中的零件数
             form_out[8] = 1
+            form_out[10] = line[9]
             if line[1] == line[1]:
                 if line[5] == line[5] and line[6] == line[6]:
                     cal += 1
@@ -35,6 +36,7 @@ class InfoPro:
                     form_out[6] = line[5]
                     form_out[7]= line[6]
                     form_out[5]= line[4]
+
                     self.form_out.append(form_out)
                 elif  str(line[1]).find('*')!= -1 and match('^[HWNZJ]',line[1]) and not match('^[J|j][w|W]',line[1]) :
                     cal += 1
