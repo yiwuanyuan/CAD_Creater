@@ -72,17 +72,16 @@ class GetExcelInfo:
                             # print('请检查%s行数据是否异常' % list_num)
                     else:
                         docx_input['sum'] = format_input['sum'] = int(mark_sum)
-                    #单纯的为了之后代码简单
-                    para1 = format_input['parameter'][0]
-                    para2 = format_input['parameter'][1]
-                    if format_input['type'] == '整圆':
-                        docx_input['size'] = '直径: ' + str(para1)
-                    elif format_input['type'] == '接管':
-                        docx_input['size'] = '展开长: ' + str(int(para1) + 1) + ' 宽度: ' + str(para2)
-                    elif format_input['type'] == '圆环':
-                        docx_input['size'] = '外直径: ' + str(para1) + ' 内直径: ' + str(para2)
-                    else:
-                        docx_input['size'] = '长度: ' + str(int(para1) + 1) + ' 宽度: ' + str(para2)
+
+
+                #     if format_input['type'] == '整圆':
+                #         docx_input['size'] = '直径: ' + str(format_input['parameter']['od'])
+                #     elif format_input['type'] == '接管':
+                #         docx_input['size'] = '展开长: ' + str(int(format_input['parameter']['w']) + 1) + ' 宽度: ' + str(format_input['parameter']['l'])
+                #     elif format_input['type'] == '圆环':
+                #         docx_input['size'] = '外直径: ' + str(format_input['parameter']['od']) + ' 内直径: ' + str(format_input['parameter']['id'])
+                #     else:
+                #         docx_input['size'] = '长度: ' + str(int(format_input['parameter']['l']) + 1) + ' 宽度: ' + str(format_input['parameter']['w'])
                     self.docx_list.append(docx_input)
                 format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(format_input['sum'])
 
@@ -93,6 +92,7 @@ class GetExcelInfo:
                 docx_input['part_name'] = part_name
                 docx_input['material'] = str(material)
                 docx_input['thickness'] = thickness
+                format_input['sum'] = int(sum_num)
                 if p2 != p2 or p2 ==0 or type(p2) == str :
                     # 内直径为空
                     format_input['type']='整圆'
@@ -133,22 +133,21 @@ class GetExcelInfo:
                     if str(remark).find('拼') != -1:
                         for i in findall('[^\d]*(\d+)[^\d]*', remark):
                             degree = 360/int(i[0])
-                            sum_num *= int(i[0])
+                            format_input['sum'] = format_input['sum'] * int(i[0])
                         format_input['parameter'].update({'angle': degree})
                 #判断是否为弧板
-                elif part_name.find('弧')!=-1:
+                elif part_name.find('HB')!=-1:
                     format_input['type'] = '弧板'
-
-                    if float(thickness)<=80:
+                    if  thickness<=80:
                         format_input['parameter'].update({'od': (p1 + p2)*2})
                         format_input['parameter'].update({'id': p1*2})
-                        format_input['parameter'].update({'angle': float(findall('[^\d]*(\d+)\.?[^\d]*',remark)[0])})
+                        format_input['parameter'].update({'angle': float(re.findall('[^\d]*(\d+)\.?[^\d]*',remark)[0])})
                     else:
-                        format_input['parameter'].update({'l': (p1*2 + p2)*3.1415926})
-                        n=sum_num/math.floor(360/float(findall('[^\d]*(\d+)\.?[^\d]*',remark)[0]))
-                        format_input['parameter'].update({'w': thickness*n})
-                        thickness=p2
-                        sum_num=1
+                        format_input['parameter'].update({'w': (p1*2 + p2)*3.1415926})
+                        n=sum_num/math.floor(360/float(re.findall('[^\d]*(\d+)\.?[^\d]*',remark)[0]))
+                        format_input['parameter'].update({'l': thickness*n})
+                        format_input['thickness']=float(p2)
+                        format_input['sum']=1
 
                 else:
                     format_input['type'] = '搭板'
@@ -197,5 +196,5 @@ class GetExcelInfo:
     #     print(result_1000)
     #     estimate_1219 = '均使用板幅1219所需重量:%d kg' %(bellows_weight_1000*1.22+bellows_weight_1219)
     #     print(estimate_1219)
-
-g = GetExcelInfo('C:/Users/wang&shao/Documents/WeChat Files/yuan598224009/Files/V2/MM-2108  0-0.xlsx')
+#
+# g = GetExcelInfo('E:/Program Files/feiq/Recv Files/V2/MM-2108  0-0.xlsx')

@@ -85,10 +85,10 @@ def gui_creator():
     path = tk.StringVar()
     tk.Entry(frame_l, textvariable = path).pack()
 
-    tk.Button(frame_l,text='选择文件所在位置',command=sel_doc).grid(row=0,sticky=N+S)
+    tk.Button(frame_l,text='选择文件所在位置',command=sel_doc).pack()
     # tk.Button(frame_l,text='选择文件夹所在位置',command=sel_doc).grid(row=0
-    tk.Button(w,text='一键生成dxf数据',command=let_work).grid(row=1,sticky=N+S)
-    tk.Button(w,text='一键生成下料清单',command=let_docx_work).grid(row=2,sticky=N+S)
+    tk.Button(w,text='一键生成dxf数据',command=let_work).pack()
+    tk.Button(w,text='一键生成下料清单',command=let_docx_work).pack()
 
     w.mainloop()
 

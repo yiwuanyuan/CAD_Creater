@@ -20,20 +20,12 @@
     2.修复一些BUG
 0.8
     1.修复一重要BUG，
-
 1.0
     1.将程序分为6个模块，重构了部分代码，新增加以号代图识别模块
     2.可以识别设计直接导出的excel清单，简单修改后即可开始排料
     3.以号代图可以识别种
-    4.一次性可以输入个excel表格，输出文件在选定excel表格的文件中
+    4.一次性可以输入个excel表格，输出文件在默认文件夹中
     5.修复多个重要Bug
 
-
-
-
-github 命令
-git push -u origin master
-
-打包命令
 pyinstaller -F Creator2exe.2.py
 pyinstaller -F -w check_box.py
