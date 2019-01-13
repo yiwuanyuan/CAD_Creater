@@ -7,7 +7,8 @@ from OutputDocx import *
 from GetExcelInfo import *
 from DrawCreator import *
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox,N,S,W,E,ttk
+# from tkinter import *
 from tkinter.filedialog import askopenfilenames
 from re import sub
 def gui_creator():
@@ -25,10 +26,10 @@ def gui_creator():
     w.geometry("%dx%d+%d+%d" %(ww,wh,x,y))
 
     #创建显示框
-    frame_r=tk.Frame(w,height= 400,width = 300)
-    frame_r.pack(side='right',padx=10,pady=10)
-    frame_l=tk.Frame(w,height= 400,width = 300)
-    frame_l.pack(side='left',padx=10,pady=10)
+    frame_r=ttk.Frame(w,height= 400,width = 300)
+    frame_r.grid(row=0 ,column=1,columnspan=1,ipadx=10,padx=10)
+    frame_l=ttk.Frame(w,height= 400,width = 300)
+    frame_l.grid(row=0, column=0,columnspan=1,ipadx=10,padx=10)
     result1 = tk.StringVar()
     result2 = tk.StringVar()
     result3 = tk.StringVar()
@@ -37,16 +38,23 @@ def gui_creator():
     result5 = tk.StringVar()
     result6 = tk.StringVar()
     # 显示输出结果
-    tk.Label(frame_r, textvariable=result1).pack()
-    tk.Label(frame_r, textvariable=result2).pack()
-    tk.Label(frame_r, textvariable=result3).pack()
-    tk.Label(frame_r, textvariable=result4).pack()
-    tk.Label(frame_r, textvariable=result5).pack()
-    tk.Label(frame_r, textvariable=result6).pack()
+    ttk.Label(frame_r, textvariable=result1).grid(row =0 )
+    ttk.Label(frame_r, textvariable=result2).grid(row =0 )
+    ttk.Label(frame_r, textvariable=result3).grid(row =0 )
+    ttk.Label(frame_r, textvariable=result4).grid(row =0 )
+    ttk.Label(frame_r, textvariable=result5).grid(row =0 )
+    ttk.Label(frame_r, textvariable=result6).grid(row =0 )
     def sel_doc():
         path_ = askopenfilenames(filetypes=[("text file", "*.xlsx"), ("all", "*.*")], )
         path.set(path_)
-        path.get()
+
+        addr_arr = []
+        for i  in path.get().strip('(').strip(')').split(','):
+            addr_arr.append(i.split('/')[-1].strip("'"))
+        xlsx_addr.set(addr_arr)
+        # for i in addr_arr:
+        #     excel_list.insert(i)
+        # path.get()
 
     def let_work():
         if  path.get():
@@ -79,16 +87,18 @@ def gui_creator():
 
         else:
              messagebox.showinfo(title='提示', message='至少选择一个Excel文件')
-        result5.set('文件已生成')
+        messagebox.showinfo(title='提示', message='文件已生成')
 
-    tk.Label(frame_l, text="目标路径:").pack()
+    ttk.Label(frame_l, text="目标路径:").grid(row =0,column=0,sticky = N+S )
     path = tk.StringVar()
-    tk.Entry(frame_l, textvariable = path).pack()
+    xlsx_addr = tk.StringVar()
+    excel_list = tk.Listbox(frame_l,listvariable=xlsx_addr,width = 28,height = 4).grid(row =1,column=1,columnspan=2,rowspan =2,sticky=E+W,pady=1)
+    ttk.Entry(frame_l, textvariable = path).grid(row =0,column=1,pady=1,padx=2,sticky = N+S)
 
-    tk.Button(frame_l,text='选择文件所在位置',command=sel_doc).pack()
-    # tk.Button(frame_l,text='选择文件夹所在位置',command=sel_doc).grid(row=0
-    tk.Button(w,text='一键生成dxf数据',command=let_work).pack()
-    tk.Button(w,text='一键生成下料清单',command=let_docx_work).pack()
+    ttk.Button(frame_l,text='选择文件所在位置',command=sel_doc).grid(row =0,column=2,sticky = N+S)
+    # ttk.Button(frame_l,text='选择文件夹所在位置',command=sel_doc).grid(row=0
+    ttk.Button(frame_r,text='一键生成dxf数据',command=let_work).grid(row =0,sticky=E+W,pady=1)
+    ttk.Button(frame_r,text='一键生成下料清单',command=let_docx_work).grid(row =1,sticky=E+W,pady=1)
 
     w.mainloop()
 

@@ -27,5 +27,11 @@
     4.一次性可以输入个excel表格，输出文件在默认文件夹中
     5.修复多个重要Bug
 
+
+
+1.1 todo
+    修改图形界面，
+    新增加可输出被略过的行数
+    错误抛出系统，可以将出错的行略过或者显示在图形界面
 pyinstaller -F Creator2exe.2.py
 pyinstaller -F -w check_box.py
