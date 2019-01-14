@@ -21,14 +21,18 @@ class GetExcelInfo:
         # 设定输出到下料清单的数据
         self.docx_list = []
         self.output = []
+        self.addr = address
+
         # bellows_weight_1219 = 0
         # bellows_weight_1000 = 0
 
         #判断模板Excel的类型
         if address.find('排料清单')!=-1:
             inform = read_excel(address,skiprows=1).values
+            self.omit_value = False
         else:
             inform  = InfoPro(address).form_out
+            self.omit_value = InfoPro(address).omit_value
         for line in inform:
             docx_input = {}
             format_input = {}

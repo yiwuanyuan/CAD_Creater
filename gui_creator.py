@@ -44,6 +44,10 @@ def gui_creator():
     ttk.Label(frame_r, textvariable=result4).grid(row =0 )
     ttk.Label(frame_r, textvariable=result5).grid(row =0 )
     ttk.Label(frame_r, textvariable=result6).grid(row =0 )
+
+    def out_omitexcel(arr,addr):
+        pass
+
     def sel_doc():
         path_ = askopenfilenames(filetypes=[("text file", "*.xlsx"), ("all", "*.*")], )
         path.set(path_)
@@ -59,13 +63,23 @@ def gui_creator():
     def let_work():
         if  path.get():
             addr = path.get().strip('(').strip(')').split(',')
+            omit_gathor
             for ad in addr:
                 if ad!= '':
                     g = GetExcelInfo(ad.strip().strip('\''))
                     doc_addr = '/'.join(ad.strip().strip('\'').split('/')[:-1])
+                    print(g.omit_value)
                     for i in g.output:
-                        print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'],)
+                        # print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'],)
                         DrawCreator(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], address=doc_addr)
+                    if g.omit_value:
+
+                        if messagebox.askyesno(title= '提示',message='存在被略去数据，是否导出Excel',):
+                            df = DataFrame(g.omit_value)
+                            out_addr = doc_addr
+                            print(out_addr + '/被省略的1')
+                            df.to_excel(out_addr + '/被省略的excel.xlsx',sheet_name='Sheet1')
+
         else:
             messagebox.showinfo(title='提示', message='至少选择一个Excel文件')
 
@@ -82,7 +96,7 @@ def gui_creator():
                 if ad != '':
                     xls_addr = ad.strip().strip('\'')
                     g = GetExcelInfo(xls_addr)
-                    print(g.docx_list)
+
                     OutputDocx(g.docx_list,address=xls_addr)
 
         else:
@@ -99,6 +113,8 @@ def gui_creator():
     # ttk.Button(frame_l,text='选择文件夹所在位置',command=sel_doc).grid(row=0
     ttk.Button(frame_r,text='一键生成dxf数据',command=let_work).grid(row =0,sticky=E+W,pady=1)
     ttk.Button(frame_r,text='一键生成下料清单',command=let_docx_work).grid(row =1,sticky=E+W,pady=1)
+    ttk.Button(frame_r, text='生成被略去文件清单', command=out_omitexcel).grid(row=2, sticky=E + W, pady=1)
+
 
     w.mainloop()
 
