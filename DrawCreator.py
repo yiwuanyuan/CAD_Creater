@@ -53,28 +53,24 @@ def DrawCreator(name,type,parameter,material,thickness=0,address =dirc):
     file_name = name + '.dxf' #加一步判据
     file_name = re.sub('[\\\]|[\/]|[\*]', '_', file_name)
     drawing = dxf.drawing(file_name)
+
     if 'od'in parameter and not('id'in parameter):
-        parameter['od']=float(parameter['od'])
+
         drawing.add(dxf.circle(radius=(parameter['od'])/2,center=(0,0)))
         # drawing.add(dxf.text(file_name,height=parameter[0]/4,alignpoint =(0,0)))
     elif 'od'in parameter and 'id'in parameter and not('angle'in parameter):
-        parameter['od'] = float(parameter['od'])
-        parameter['id'] = float(parameter['id'])
+
         drawing.add(dxf.circle(radius=(parameter['od'])/2, center=(0, 0)))
         drawing.add(dxf.circle(radius=(parameter['id'])/2, center=(0, 0)))
         # drawing.add(dxf.text(file_name,height=parameter[1]/4, alignpoint =(0,0)))
     elif 'od' in parameter and 'id' in parameter and 'angle' in parameter:
-        parameter['od'] = float(parameter['od'])
-        parameter['id'] = float(parameter['id'])
-        parameter['angle'] = float(parameter['angle'])
         drawing.add(dxf.arc(radius=parameter['od']/2,center=(0, 0),startangle=0,endangle=parameter['angle']))
         drawing.add(dxf.arc(radius=(parameter['id'])/2,center=(0, 0),startangle=0,endangle=parameter['angle']))
         drawing.add(dxf.polyline(points=[(parameter['od']/2, 0), ((parameter['id'])/2,0)]))
         drawing.add(dxf.polyline(points=[((parameter['od'])/2*math.cos(parameter['angle']*math.pi/180), (parameter['od'])/2*math.sin(parameter['angle']*math.pi/180)),
                                          ((parameter['id']) / 2 * math.cos(parameter['angle'] * math.pi / 180),(parameter['id']) / 2 * math.sin(parameter['angle'] * math.pi / 180))]))
     elif 'w' in parameter and 'l' in parameter:
-        parameter['w'] = float(parameter['w'])
-        parameter['l'] = float(parameter['l'])
+
         drawing.add(
             dxf.polyline(
                 points=[(0,0),(0,parameter['w']),(parameter['l'],parameter['w']),(parameter['l'],0),(0,0)]

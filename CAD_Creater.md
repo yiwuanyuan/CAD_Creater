@@ -33,5 +33,5 @@
     修改图形界面，
     新增加可输出被略过的行数
     错误抛出系统，可以将出错的行略过或者显示在图形界面
-pyinstaller -F Creator2exe.2.py
+pyinstaller -F gui_creator.py
 pyinstaller -F -w check_box.py

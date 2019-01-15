@@ -4,7 +4,7 @@
 # Author: Wangyuan
 # Date  : 2019-1-4
 from re import match,sub
-from pandas import read_excel,DataFrame
+from pandas import read_excel,DataFrame,ExcelWriter
 class InfoPro:
 
     def __init__(self,addr):
