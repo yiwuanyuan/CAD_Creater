@@ -128,3 +128,5 @@ class Str2map:
             self.error['code'] = "003"
             self.error['content'] = "该以号代图未收录"
 
+
+

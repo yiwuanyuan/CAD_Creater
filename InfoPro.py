@@ -11,10 +11,10 @@ class InfoPro:
         self.form_out = []
         self.omit_value = []
         self.addr = addr
-        df = read_excel(addr, skipfooter= 1)
+        df = read_excel(addr)
         cal = 0
         line_len = len(df.values)
-        for line in reversed(df.values):
+        for line in df.values:
             form_out = {}
             # 对应excel中的通径
             form_out[1] = addr.split('/')[-1].split(' ')[0]
@@ -31,16 +31,15 @@ class InfoPro:
             form_out[10] = line[9]
             if line[1] == line[1]:
                 if line[5] == line[5] and line[6] == line[6]:
-                    cal += 1
-                    form_out[0] = cal
+                    form_out[0] = line[0]
                     form_out[6] = line[5]
                     form_out[7]= line[6]
                     form_out[5]= line[4]
 
                     self.form_out.append(form_out)
-                elif  str(line[1]).find('*')!= -1 and match('^[HWNZJ]',line[1]) and not match('^[J|j][w|W]',line[1]) :
+                elif  str(line[1]).find('*')!= -1:
                     cal += 1
-                    form_out[0] = cal
+                    form_out[0] = line[0]
                     form_out[6] = line[1]
                     form_out[7] = 0
                     form_out[5] = 0

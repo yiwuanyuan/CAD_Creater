@@ -78,6 +78,7 @@ def gui_creator():
                     if g.stop :
                         messagebox.showerror(title='表格错误',message='该表格式有错，已略过')
                     else:
+                        print(g.error_gather)
                         for i in g.output:
                             try:
                                 DrawCreator(i['name'], i['type'], i['parameter'], i['material'], i['thickness'],
@@ -122,6 +123,7 @@ def gui_creator():
                 if ad != '':
                     xls_addr = ad.strip().strip('\'')
                     g = GetExcelInfo(xls_addr)
+
                     if g.excel_type == 'HD':
                         OutputDocx(g.docx_list,address=xls_addr)
                         show_info += 1

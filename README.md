@@ -1,5 +1,5 @@
-0.1
-    1.项目开始
+### 0.1
+    ##### 1.项目开始
 0.2
     1.可以针对不同形状的零件（接管，圆板，环板）生成DXF文件
 0.3
@@ -28,6 +28,14 @@
     4.一次性可以输入个excel表格，输出文件在选定excel表格的文件中
     5.修复多个重要Bug
 
+1.1 todo
+    修改图形界面，   50%
+    新增加可输出被略过的行数    OK
+    错误抛出系统，可以将出错的行略过或者显示在图形界面   50%
+    生成format_input对象都打印在Gui中
+    info_Pro里 修改行数序号，与原Excel表一致
+
+
 
 
 
@@ -35,5 +43,6 @@ github 命令
 git push -u origin master
 
 打包命令
+pyinstaller -F gui_creator.py
 pyinstaller -F gui_c.2.py
 pyinstaller -F -w check_box.py
