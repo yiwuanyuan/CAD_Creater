@@ -32,6 +32,7 @@ def gui_creator():
     frame_l.grid(row=0, column=0,columnspan=1,ipadx=10,padx=10)
     result1 = tk.StringVar()
     error_text = tk.StringVar()
+    document_addr = tk.StringVar()
     result3 = tk.StringVar()
     result4 = tk.StringVar()
     global result5,result6
@@ -51,10 +52,13 @@ def gui_creator():
     def sel_doc():
         path_ = askopenfilenames(filetypes=[("text file", "*.xlsx"), ("all", "*.*")], )
         path.set(path_)
+        document_addr.set('/'.join(path.get().strip('(').strip(')')
+                          .split(',')[0].strip('\'').split('/')[:-1]))
 
         addr_arr = []
         for i  in path.get().strip('(').strip(')').split(','):
-            addr_arr.append(i.split('/')[-1].strip("'"))
+            if not i == '':
+                addr_arr.append(i.split('/')[-1].strip("'"))
         xlsx_addr.set(addr_arr)
         # for i in addr_arr:
         #     excel_list.insert(i)
@@ -111,29 +115,35 @@ def gui_creator():
         # result4.set(estimate_1219)
 
     def let_docx_work():
+        show_info = 0
         if path.get():
             addr = path.get().strip('(').strip(')').split(',')
             for ad in addr:
                 if ad != '':
                     xls_addr = ad.strip().strip('\'')
                     g = GetExcelInfo(xls_addr)
-
-                    OutputDocx(g.docx_list,address=xls_addr)
+                    if g.excel_type == 'HD':
+                        OutputDocx(g.docx_list,address=xls_addr)
+                        show_info += 1
+                    else:
+                        messagebox.showinfo(title='提示', message='%s 该文件不需要生成排料清单'%g.addr.split('/')[-1])
 
         else:
              messagebox.showinfo(title='提示', message='至少选择一个Excel文件')
-        messagebox.showinfo(title='提示', message='文件已生成')
+        if not show_info == 0:
+            messagebox.showinfo(title='提示', message='文件已生成')
 
     ttk.Label(frame_l, text="目标路径:").grid(row =0,column=0,sticky = N+S )
+    ttk.Label(frame_l, text="输入文件:").grid(row =1,column=0,sticky = N+S )
     path = tk.StringVar()
     xlsx_addr = tk.StringVar()
-    excel_list = tk.Listbox(frame_l,listvariable=xlsx_addr,width = 28,height = 4).grid(row =1,column=1,columnspan=2,rowspan =2,sticky=E+W,pady=1)
-    ttk.Entry(frame_l, textvariable = path).grid(row =0,column=1,pady=1,padx=2,sticky = N+S)
+    excel_list = tk.Listbox(frame_l,listvariable=xlsx_addr,width = 30,height = 4).grid(row =1,column=1,columnspan=2,rowspan =2,pady=1)
+    ttk.Label(frame_l, textvariable =document_addr,width = 30).grid(row =0,column=1,pady=1,padx=2,sticky = N+S)
 
-    ttk.Button(frame_l,text='选择文件所在位置',command=sel_doc).grid(row =0,column=2,sticky = N+S)
+    ttk.Button(frame_l,text='选择文件所在位置',command=sel_doc).grid(row =0,column=3,sticky = E+W,padx=2)
     # ttk.Button(frame_l,text='选择文件夹所在位置',command=sel_doc).grid(row=0
-    ttk.Button(frame_r,text='一键生成dxf数据',command=let_work).grid(row =0,sticky=E+W,pady=1)
-    ttk.Button(frame_r,text='一键生成下料清单',command=let_docx_work).grid(row =1,sticky=E+W,pady=1)
+    ttk.Button(frame_l,text='一键生成dxf数据',command=let_work).grid(row =1,column=3,sticky=E+W,pady=1,padx=2)
+    ttk.Button(frame_l,text='一键生成下料清单',command=let_docx_work).grid(row =2,column=3,sticky=E+W,pady=1,padx=2)
     # ttk.Button(frame_r, text='生成被略去文件清单', command=out_omitexcel).grid(row=2, sticky=E + W, pady=1)
 
 

@@ -32,12 +32,14 @@ class GetExcelInfo:
         try:
             if address.find('排料清单') != -1:
                 inform = read_excel(address, skiprows=1).values
+                self.excel_type = 'HD'
                 self.omit_value = False
             else:
                 inform = InfoPro(address).form_out
                 if inform == []:
                     self.stop = True
                     return
+                self.excel_type = 'GY'
                 self.omit_value = InfoPro(address).omit_value
         except BaseException:
             print('excel表转换异常！！！')
@@ -95,14 +97,14 @@ class GetExcelInfo:
                     except BaseException:
                         self.error_gather.append(b.error)
 
-                    #     if format_input['type'] == '整圆':
-                    #         docx_input['size'] = '直径: ' + str(format_input['parameter']['od'])
-                    #     elif format_input['type'] == '接管':
-                    #         docx_input['size'] = '展开长: ' + str(int(format_input['parameter']['w']) + 1) + ' 宽度: ' + str(format_input['parameter']['l'])
-                    #     elif format_input['type'] == '圆环':
-                    #         docx_input['size'] = '外直径: ' + str(format_input['parameter']['od']) + ' 内直径: ' + str(format_input['parameter']['id'])
-                    #     else:
-                    #         docx_input['size'] = '长度: ' + str(int(format_input['parameter']['l']) + 1) + ' 宽度: ' + str(format_input['parameter']['w'])
+                        if format_input['type'] == '整圆':
+                            docx_input['size'] = '直径: ' + str(format_input['parameter']['od'])
+                        elif format_input['type'] == '接管':
+                            docx_input['size'] = '展开长: ' + str(int(format_input['parameter']['w']) + 1) + ' 宽度: ' + str(format_input['parameter']['l'])
+                        elif format_input['type'] == '圆环':
+                            docx_input['size'] = '外直径: ' + str(format_input['parameter']['od']) + ' 内直径: ' + str(format_input['parameter']['id'])
+                        else:
+                            docx_input['size'] = '长度: ' + str(int(format_input['parameter']['l']) + 1) + ' 宽度: ' + str(format_input['parameter']['w'])
                         self.docx_list.append(docx_input)
                     format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(format_input['sum'])
 

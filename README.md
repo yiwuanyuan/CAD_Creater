@@ -35,5 +35,5 @@ github 命令
 git push -u origin master
 
 打包命令
-pyinstaller -F Creator2exe.2.py
+pyinstaller -F gui_c.2.py
 pyinstaller -F -w check_box.py

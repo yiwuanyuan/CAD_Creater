@@ -35,3 +35,4 @@
     错误抛出系统，可以将出错的行略过或者显示在图形界面
 pyinstaller -F gui_creator.py
 pyinstaller -F -w check_box.py
+pyinstaller -F gui_creator.py
