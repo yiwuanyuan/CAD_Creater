@@ -66,7 +66,10 @@ class GetExcelInfo:
                 # 宽度、接管长、环板内直径
                 sum_num = int(line[8])
                 mark_sum = line[9]
-                remark = line[10]
+                if len(line) > 10:
+                    remark = line[10]
+                else:
+                    remark = ''
 
                 if findall('\*', str(p1)):  #如果列6是以号代图,则识别以号代图
                     b = Str2map(p1)
