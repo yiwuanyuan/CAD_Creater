@@ -16,6 +16,33 @@ import time
 from os import getcwd,path,chdir
 from glob import glob
 
+def docx_info(info):
+    docx_input['sum'] = format_input['sum']
+    docx_input['thickness'] = format_input['thickness']
+    docx_input['material'] = format_input['material']
+
+    #判断类型的
+    if format_input['type'] == '整圆':
+        docx_input['size'] = '直径: ' + str(format_input['parameter']['od'])
+    elif format_input['type'] == '接管':
+        docx_input['size'] = '展开长: ' + str(int(format_input['parameter']['w']) + 1) + ' 宽度: ' + str(
+            format_input['parameter']['l'])
+    elif format_input['type'] == '圆环':
+        docx_input['size'] = '外直径: ' + str(format_input['parameter']['od']) + ' 内直径: ' + str(
+            format_input['parameter']['id'])
+    elif format_input['type'] == '吊耳' or format_input['type'] == '耳板' or format_input['type'] == '耳板':
+        docx_input['size'] = '长度: ' + str(int(format_input['parameter']['l']) + 1) + ' 宽度: ' + str(
+            format_input['parameter']['w'])
+    else:
+        docx_input['size'] = '长度: ' + str(int(format_input['parameter']['l']) + 1) + ' 宽度: ' + str(
+            format_input['parameter']['w'])
+    self.docx_list.append(docx_input)
+    format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(format_input['sum'])
+
+
+
+
+
 #改写成一个类
 def OutputDocx(info,address):
     addr = '/'.join(address.strip().strip('\'').split('/')[:-1])

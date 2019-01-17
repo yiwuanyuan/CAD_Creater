@@ -124,7 +124,6 @@ class Str2map:
             self.num=2
             return
         else:
-            print("该以号代图未收录")
             self.error['code'] = "003"
             self.error['content'] = "该以号代图未收录"
 
