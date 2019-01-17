@@ -69,7 +69,8 @@ class GetExcelInfo:
                 else:
                     remark = ''
 
-                format_input['parameter'] = pro_name
+                format_input['product_code'] = pro_name
+                format_input['part_name'] = part_name
             except  BaseException:
                 error = {}
                 error["code"] = "004"
@@ -92,8 +93,6 @@ class GetExcelInfo:
 
                     # 如果是其他类型的零件就将文件输出
                     else:
-                        format_input['product_code'] = pro_name
-                        format_input['part_name'] = part_name
 
                         if mark_sum != pro_sum * sum_num:
                             if mark_sum != mark_sum:
@@ -129,7 +128,6 @@ class GetExcelInfo:
                         p1 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p1))[0])
                         format_input['type'] = '整圆'
                         format_input['parameter'].update({'od': p1})
-
                     elif part_name.find("接管") != -1 or ((str(p1).find("径") != -1 and str(p2).find("径") == -1)):
                         format_input['type'] = '接管'
                         p1 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p1))[0])

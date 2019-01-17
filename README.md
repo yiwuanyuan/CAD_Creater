@@ -34,7 +34,7 @@
     错误抛出系统，可以将出错的行略过或者显示在图形界面   50%
     生成format_input对象都打印在Gui中
     info_Pro里 修改行数序号，与原Excel表一致 ok
-    删除GetExcelInfo里关于Docx相关的内容，以后outputDocx要对传入G.output数据进行处理  50%
+    删除GetExcelInfo里关于Docx相关的内容，以后outputDocx要对传入G.output数据进行处理  ok
 
 
 

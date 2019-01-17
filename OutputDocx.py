@@ -3,7 +3,7 @@
 # File  : OutputDocx.py
 # Author: Wangyuan
 # Date  : 2019-1-3
-from GetExcelInfo import *
+
 from docx import Document
 from docx.shared import Mm
 from docx.shared import Pt
@@ -13,34 +13,28 @@ from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.style import WD_STYLE_TYPE
 import time
-from os import getcwd,path,chdir
-from glob import glob
+from os import chdir
 
-def docx_info(info):
-    docx_input['sum'] = format_input['sum']
-    docx_input['thickness'] = format_input['thickness']
-    docx_input['material'] = format_input['material']
+def size_info(parameter):
 
-    #判断类型的
-    if format_input['type'] == '整圆':
-        docx_input['size'] = '直径: ' + str(format_input['parameter']['od'])
-    elif format_input['type'] == '接管':
-        docx_input['size'] = '展开长: ' + str(int(format_input['parameter']['w']) + 1) + ' 宽度: ' + str(
-            format_input['parameter']['l'])
-    elif format_input['type'] == '圆环':
-        docx_input['size'] = '外直径: ' + str(format_input['parameter']['od']) + ' 内直径: ' + str(
-            format_input['parameter']['id'])
-    elif format_input['type'] == '吊耳' or format_input['type'] == '耳板' or format_input['type'] == '耳板':
-        docx_input['size'] = '长度: ' + str(int(format_input['parameter']['l']) + 1) + ' 宽度: ' + str(
-            format_input['parameter']['w'])
+    if 'od' in parameter and not ('id' in parameter):
+        size = '直径: ' + str(parameter['od'])
+        return size
+
+    elif 'od' in parameter and 'id' in parameter and not ('angle' in parameter):
+        size = '外直径: ' + str(parameter['od']) + ' 内直径: ' + str(parameter['id'])
+        return size
+
+    elif 'od' in parameter and 'id' in parameter and 'angle' in parameter:
+        size = '外直径: ' + str(parameter['od']) + ' 内直径: ' + str(parameter['id']) + ' 弧度: ' + str(parameter['angle'])
+        return size
+    elif 'w' in parameter and 'l' in parameter:
+        size = '长度: ' + str(int(parameter['l']) + 1) + ' 宽度: ' + str(parameter['w'])
+        return size
+
     else:
-        docx_input['size'] = '长度: ' + str(int(format_input['parameter']['l']) + 1) + ' 宽度: ' + str(
-            format_input['parameter']['w'])
-    self.docx_list.append(docx_input)
-    format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(format_input['sum'])
-
-
-
+        size = '错误内容'
+        return size
 
 
 #改写成一个类
@@ -129,7 +123,7 @@ def OutputDocx(info,address):
         table.cell(y + 2, 2).text = str(list['part_name'])
         table.cell(y + 2, 3).text = str(list['material'])
         table.cell(y + 2, 4).text = str(list['thickness'])
-        table.cell(y + 2, 5).text = str(list['size'])
+        table.cell(y + 2, 5).text = size_info(list['parameter'])
         table.cell(y + 2, 6).text = str(list['sum'])
         for x in range(tcol):
             table.cell(y + 2, x).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
