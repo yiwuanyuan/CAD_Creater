@@ -36,7 +36,7 @@ def gui_creator():
     frame_l2 = tk.LabelFrame(w, height=200, width=290,text='执行')
     frame_l2.grid(row=1, column=0, ipadx=10,padx=5)
     result1 = tk.StringVar()
-    error_text = tk.StringVar()
+
     document_addr = tk.StringVar()
     result3 = tk.StringVar()
     result4 = tk.StringVar()
@@ -151,28 +151,30 @@ def gui_creator():
     lb3 = tk.LabelFrame(frame_r, width=270, height=390, text='预览')
     lb3.grid(row=0, column=1, rowspan=2,padx=5,pady=5)
 
-    tree = ttk.Treeview(lb3, selectmode='browse')
+    error_text = tk.StringVar()
+    error_info = tk.Text(lb3,t)
+
+    # tree = ttk.Treeview(lb3, selectmode='browse')
     # vsb = tk.Scrollbar(frame_r, width=300, orient="vertical", command=tree.yview)
     # tree.configure(yscrollcommand=vsb.set)
     # vsb.place(x=-5, y=0, height=320)
 
-    tree["columns"] = ("1", "2")
-    tree['show'] = 'headings'
-    tree.column("1", width=100, anchor='c')
-    tree.column("2", width=100, anchor='c')
-    tree.heading("1", text="Account")
-    tree.heading("2", text="Type")
-    for i in range(30):
-        tree.insert("", 'end', text="L1", values=(i, "Best"))
-    tree.place(x=300, y=0, width=270, height=360)
+    # tree["columns"] = ("1", "2")
+    # tree['show'] = 'headings'
+    # tree.column("1", width=100, anchor='c')
+    # tree.column("2", width=100, anchor='c')
+    # tree.heading("1", text="Account")
+    # tree.heading("2", text="Type")
+    # for i in range(30):
+    #     tree.insert("", 'end', text="L1", values=(i, "Best"))
+    # tree.place(x=300, y=0, width=270, height=360)
 
 
     ttk.Label(frame_l1, textvariable=document_addr, width=30).grid(row=0, column=1, pady=1, padx=2, sticky=N + S)
-
-    ttk.Button(frame_l2, text='选择文件所在位置', command=sel_doc).grid(row=0, column=3, sticky=E + W, padx=2)
+    ttk.Button(frame_l2, text='选择文件', command=sel_doc).grid(row=0, column=1, sticky=E + W, padx=5, pady=5)
     # ttk.Button(frame_l,text='选择文件夹所在位置',command=sel_doc).grid(row=0
-    ttk.Button(frame_l2, text='一键生成dxf数据', command=let_work).grid(row=1, column=3, sticky=E + W, pady=1, padx=2)
-    ttk.Button(frame_l2, text='一键生成下料清单', command=let_docx_work).grid(row=2, column=3, sticky=E + W, pady=1, padx=2)
+    ttk.Button(frame_l2, text='生成dxf文件', command=let_work).grid(row=0, column=2, sticky=E + W, pady=10, padx=5)
+    ttk.Button(frame_l2, text='生成下料清单', command=let_docx_work).grid(row=0, column=3, sticky=E + W, pady=10, padx=5)
     # ttk.Button(frame_r, text='生成被略去文件清单', command=out_omitexcel).grid(row=2, sticky=E + W, pady=1)
 
     w.mainloop()
