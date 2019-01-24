@@ -125,7 +125,7 @@ class Str2map:
             return
         else:
             self.error['code'] = "003"
-            self.error['content'] = "该以号代图未收录"
+            self.error['content'] = "该以号代图未收录:"+str
 
 
 

@@ -6,6 +6,7 @@
 from OutputDocx import *
 from GetExcelInfo import *
 from DrawCreator import *
+from tkinter import *
 import tkinter as tk
 from tkinter import messagebox, N, S, W, E, ttk
 # from tkinter import *
@@ -20,7 +21,7 @@ def gui_creator():
     sw = w.winfo_screenwidth()
     # 得到屏幕宽度
     sh = w.winfo_screenheight()
-    ww = 600
+    ww = 800
     wh = 400
     x = (sw - ww) / 2
     y = (sh - wh) / 2
@@ -78,6 +79,9 @@ def gui_creator():
             for ad in addr:
                 if ad != '':
                     g = GetExcelInfo(ad.strip().strip('\''))
+                    info=g.output
+                    error=g.error_gather
+
                     doc_addr = '/'.join(ad.strip().strip('\'').split('/')[:-1])
                     print(g.output)
                     if g.stop:
@@ -89,9 +93,12 @@ def gui_creator():
                                 DrawCreator(i['name'], i['type'], i['parameter'], i['material'], i['thickness'],
                                             address=doc_addr)
                             except BaseException:
+
                                 error_text.set('绘图错误请检查！！！')
                                 print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'])
                                 print('绘图错误请检查！！！')
+                        addinfo(info)
+                        adderror(error)
 
                         if g.omit_value:
                             omit = {}
@@ -114,12 +121,18 @@ def gui_creator():
         else:
             messagebox.showinfo(title='提示', message='至少选择一个Excel文件')
 
-        # 初始化显示数据
-        # result1.set(result_success)
-        # result2.set(result_1219)
-        # result3.set(result_1000)
-        # result4.set(estimate_1219)
+    def addinfo(info):
+        for i in info:
+            infoBox.insert(END,i['name']+str(i['parameter'])+'\n')
 
+    def adderror(error):
+        for i in error:
+            errorBox.insert(END, i['content']+'\n')
+    def clear():
+        infoBox.delete('1.0',END)
+        errorBox.delete('1.0',END)
+        xlsx_addr.set('')
+        path.set('')
     def let_docx_work():
         show_info = 0
         if path.get():
@@ -148,26 +161,14 @@ def gui_creator():
     excel_list = tk.Listbox(frame_l1, listvariable=xlsx_addr, width=30, height=4).grid(row=1, column=1, columnspan=2,rowspan=2, pady=10)
 
     # 错误预览框
-    lb3 = tk.LabelFrame(frame_r, width=270, height=390, text='预览')
-    lb3.grid(row=0, column=1, rowspan=2,padx=5,pady=5)
+    tk.Label(frame_r, text="提示信息").grid()
+    infoBox = tk.Text(frame_r, width=60, height=10)
+    infoBox.grid(padx=10, pady=10)
+    tk.Label(frame_r, text="错误报障").grid()
+    errorBox = tk.Text(frame_r, width=60, height=10)
+    errorBox.grid(padx=10, pady=10)
+    tk.Button(frame_r, text='Clear', command=clear).grid()
 
-    error_text = tk.StringVar()
-    error_info = tk.Text(lb3,t)
-
-    # tree = ttk.Treeview(lb3, selectmode='browse')
-    # vsb = tk.Scrollbar(frame_r, width=300, orient="vertical", command=tree.yview)
-    # tree.configure(yscrollcommand=vsb.set)
-    # vsb.place(x=-5, y=0, height=320)
-
-    # tree["columns"] = ("1", "2")
-    # tree['show'] = 'headings'
-    # tree.column("1", width=100, anchor='c')
-    # tree.column("2", width=100, anchor='c')
-    # tree.heading("1", text="Account")
-    # tree.heading("2", text="Type")
-    # for i in range(30):
-    #     tree.insert("", 'end', text="L1", values=(i, "Best"))
-    # tree.place(x=300, y=0, width=270, height=360)
 
 
     ttk.Label(frame_l1, textvariable=document_addr, width=30).grid(row=0, column=1, pady=1, padx=2, sticky=N + S)
