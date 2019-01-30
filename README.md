@@ -35,9 +35,12 @@
     生成format_input对象都打印在Gui中
     info_Pro里 修改行数序号，与原Excel表一致 ok
     删除GetExcelInfo里关于Docx相关的内容，以后outputDocx要对传入G.output数据进行处理  ok
-    添加对于锥管支持
+    添加对于锥管\三通\虾米弯支持
     长度要大于宽度
     对于机加件自动化备注
+    图形界面中加入更多设置项，实现板材拼焊
+    单独设置ping函数
+
 
 
 
