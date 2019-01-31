@@ -68,7 +68,7 @@ class GetExcelInfo:
                     remark = line[10]
                 else:
                     remark = ''
-
+                format_input['excel_list'] = list_num
                 format_input['product_code'] = pro_name
                 format_input['part_name'] = part_name
             except  BaseException:
