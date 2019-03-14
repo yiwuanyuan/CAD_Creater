@@ -12,49 +12,37 @@ class InfoPro:
         self.omit_value = []
         self.addr = addr
         df = read_excel(addr)
-        cal = 0
-        line_len = len(df.values)
         for line in df.values:
-            form_out = {}
-            # 对应excel中的通径
-            form_out[1] = addr.split('/')[-1].split(' ')[0]
-            # 对应excel中的件数
-            form_out[2] = 1
-            # 对应excel中的零件名称
-            form_out[3] = sub('\*','X',line[2])
-            # 对应excel中的数量
-            form_out[9]= line[7]
-            # 对应excel中的材料
-            form_out[4] = line[3]
-            # 对应excel中的零件数
-            form_out[8] = 1
-            form_out[10] = line[9]
-            if line[1] == line[1]:
-                if line[5] == line[5] and line[6] == line[6]:
-                    form_out[0] = line[0]
-                    form_out[6] = line[5]
-                    form_out[7]= line[6]
-                    form_out[5]= line[4]
-
-                    self.form_out.append(form_out)
-                elif  str(line[1]).find('*')!= -1:
-                    cal += 1
-                    form_out[0] = line[0]
-                    form_out[6] = line[1]
-                    form_out[7] = 0
-                    form_out[5] = 0
-                    self.form_out.append(form_out)
+            if line[1] == line[1] and line[1]!='通径' and line[3] == line[3]:
+                form_out = {}
+                # 对应excel中的序号
+                form_out[0] = line[0] # list_num
+                # 对应excel中的产品代号
+                form_out[1] = line[1] # pro_name
+                # 对应excel中的零件名称
+                form_out[2] = line[3] # part_name
+                # 对应excel中的材料
+                form_out[3] = line[4] # material
+                # 对应excel中的材料厚度
+                form_out[4] = line[5]  # thickness
+                # 长度、外径、环板外直径、以号代图
+                form_out[5]= line[6]  # p1
+                form_out[6]=line[7]  # p2
+                # 对应excel中的总数
+                if line [9] == line[9]:
+                    form_out[7]=line[9]  # mark_sum
                 else:
-                    omit_value = []
-                    for i in range(len(line)):
-                        omit_value.append(line[i])
-                    self.omit_value.append(omit_value)
+                    form_out[7] = line[2] * line[8]
+                form_out[8] = 'Whatever'  # remark
+                form_out[9]=line[10] # remark
+
+                self.form_out.append(form_out)
 
     def to_excel(self):
         df = DataFrame(self.form_out)
         df.to_excel('重整化'+self.addr)
 
-# i = InfoPro('MM-2108  0-0.xlsx')
-#
-# # print(i.form_out)
-# print(i.omit_value)
+if __name__ == '__main__':
+    i = InfoPro('3032017XXXX_排料清单.xlsx')
+    print(i.form_out)
+

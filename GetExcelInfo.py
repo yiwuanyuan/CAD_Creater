@@ -1,247 +1,273 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# File  : Creator0.5.py
-# Author: WangYuan
-# Date  : 2018-12-20
-
 from pandas import read_excel
-
+from ProcessError import *
 from os import getcwd
-from InfoPro import *
 from re import match, findall
-from str2map import *
+from StrToGraphy import *
 import math
+from SolvePing import *
+from InfoPro import *
 
 dirc = getcwd()
 global table_finish, table_result
 
 
+def a2r(angle):
+    # 角度换弧度公式
+    return angle / 180 * math.pi
+
+
+
 class GetExcelInfo:
+
     def __init__(self, address):
         # 设定输出到下料清单的数据
+
         self.output = []
-        self.addr = address
-        self.error_gather = []
-        self.stop = False
-
-        # bellows_weight_1219 = 0
-        # bellows_weight_1000 = 0
-
+        self.error = []
+        self.filter = []
+        print(address)
         # 判断模板Excel的类型
+
+        #新增加判断模板类型
         try:
             if address.find('排料清单') != -1:
-                inform = read_excel(address, skiprows=1).values
-                self.excel_type = 'HD'
-                self.omit_value = False
-            else:
                 inform = InfoPro(address).form_out
-                if inform == []:
-                    self.stop = True
-                    return
-                self.excel_type = 'GY'
-                self.omit_value = InfoPro(address).omit_value
-        except BaseException:
-            print('excel表转换异常！！！')
-            error = {}
-            error["code"] = "001"
-            error["content"] = 'excel表转换异常！！！'
-            self.error_gather.append(error)
+            else:
+                inform = read_excel(address).values
+        #
+        except Exception:
+            temp = 'excel表转换异常！！！'
+            self.error.push(temp)
+            print(temp)
+
+        address = re.findall('(.*).xlsx',address.split('/')[-1])[0]
+        # 地址信息简化（只保留文件名）
 
         for line in inform:
             try:
+
                 format_input = {}
                 format_input['parameter'] = {}
 
                 list_num = line[0]
                 pro_name = line[1]
-                pro_sum = line[2]
-                part_name = line[3]
-                material = line[4]
-                thickness = line[5]
-                p1 = line[6]
+                part_name = line[2]
+                material = line[3]
+                thickness = line[4]
+                p1 = line[5]
                 # 长度、外径、环板外直径、以号代图
-                p2 = line[7]
+                p2 = line[6]
                 # 宽度、接管长、环板内直径
-                sum_num = int(line[8])
-                mark_sum = line[9]
-                if len(line) > 10:
-                    remark = line[10]
+                mark_sum = line[7]
+                remark = line[9]
+
+                if str(pro_name).find('*') == -1 and p1 != p1 and p2 != p2:
+                    raise ProcessError(pro_name + part_name + '- - -该零件不会绘制图形', True)
+
+                if material != material:
+                    raise ProcessError('材料未定义！', False)
                 else:
-                    remark = ''
-                format_input['excel_list'] = list_num
-                format_input['product_code'] = pro_name
-                format_input['part_name'] = part_name
-            except  BaseException:
-                error = {}
-                error["code"] = "004"
-                error["content"] = '内容获取异常！！！'
-                self.error_gather.append(error)
-                return
+                    material = str(material)
 
-            if findall('\*', str(p1)):  # 如果列6是以号代图,则识别以号代图
-                b = Str2map(p1)
-                # 如果以号代图被收录
-                try:
-                    format_input['parameter'] = b.parameter
-                    format_input['type'] = b.type
-                    format_input['thickness'] = b.thickness
+                if math.isnan(mark_sum):
+                    raise ProcessError('数量未定义！', False)
+                else:
+                    mark_sum = int(mark_sum)
+
+                if findall('\*', str(pro_name)):  # 如果列6是以号代图,则识别以号代图
+                    strtography = {}
+                    strtography.update({'addr': address})
+                    strtography.update({'pro_name': pro_name})
+                    strtography.update({'list_num': list_num})
+                    strtography.update({'part_name': part_name})
+                    strtography.update({'material': material})
+                    strtography.update({'sum': mark_sum})
+                    strtography.update({'remark': remark})
+                    format_input = StrToGraphy(strtography).item
+
+                else:
+                    if math.isnan(thickness):
+                        raise ProcessError('厚度未定义！', False)
+                    else:
+                        thickness = float(thickness)
+                    # 判断除以号代图外的其他输入类型
+                    # 初始化下清单的参数
+                    format_input['addr'] = address
+                    format_input['list_num'] = list_num
+                    format_input['pro_name'] = pro_name
+                    format_input['part_name'] = part_name
+                    format_input['remark'] = remark
+                    format_input['sum'] = mark_sum
                     format_input['material'] = str(material)
-
-                    # 如果是波纹管就只修改数量
-                    if format_input['type'] == '波纹管':
-                        format_input['sum'] = int(b.num * pro_sum * sum_num)
-
-                    # 如果是其他类型的零件就将文件输出
+                    format_input['thickness'] = thickness
+                    #王元修改
+                    if format_input['addr'].find('排料清单') != -1:
+                        format_input['name'] =str(list_num) + '_' + str(pro_name) + '_' + str(part_name) + '(' + str(format_input['sum'])+')'
                     else:
+                        format_input['name'] = str(format_input['addr']) + '_' + str(list_num) + '_' + str(
+                            pro_name) + '_' + str(part_name) + '(' + str(format_input['sum']) + ')'
 
-                        if mark_sum != pro_sum * sum_num:
-                            if mark_sum != mark_sum:
-                                format_input['sum'] = int(pro_sum * sum_num)
+                    # 弯头
+                    if part_name.find('弯头') != -1:
+                        format_input['type'] = '弯头'
+                        p1 = float(findall('\d+\.\d+|\d+', str(p1))[0])
+                        d = p1 - thickness
+                        angle = float(findall('[a|A][n|N][g|G][l|L][e|E]([\d+\.\d+|\d+]+)', str(remark))[0])
+                        angle = a2r(angle)
+                        start = float(findall('[s|S][t|T][a|A][r|R][t|T]([\d+\.\d+|\d+]+)', str(remark))[0])
+                        div = float(findall('[d|D][i|I][v|V]([\d+\.\d+|\d+]+)', str(remark))[0])
+                        ping = []
+                        for j in range(int(math.pi / 2 / angle + 1)):
+                            temp = {}
+                            temp['parameter'] = {}
+                            array = []
+                            for i in range(361):
+                                current = a2r(start + i)
+                                loc = {}
+                                loc.update({'x': a2r(i) * d / 2})
+                                loc.update({'y': d / 2 * (2 - math.cos(current)) * math.tan(angle / 2)})
+                                array.append(loc)
+                            temp['parameter'].update({'array': array})
+                            if j == 0 or j == int(math.pi / 2 / angle):
+                                temp['parameter'].update({'H&T': True})
                             else:
-                                format_input['sum'] = int(mark_sum)
-                                # print('请检查%s行数据是否异常' % list_num)
-                        else:
-                            format_input['sum'] = int(mark_sum)
-                except BaseException:
-                    self.error_gather.append(b.error)
-
-            else:
-                # 判断除以号代图外的其他输入类型
-                # 初始化下清单的参数
-                # docx_input最好放在最后
-                try:
-                    format_input['thickness'] = thickness = float(thickness)
-                    if mark_sum != pro_sum * sum_num:
-                        if mark_sum != mark_sum:
-                            format_input['sum'] = int(pro_sum * sum_num)
-                        else:
-                            format_input['sum'] = int(mark_sum)
-                            # print('请检查%s行数据是否异常'%list_num)
-                    else:
-                        format_input['sum'] = int(mark_sum)
-                    format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(
-                        format_input['sum'])
-
-                    if p2 != p2 or p2 == 0 or type(p2) == str:
+                                temp['parameter'].update({'H&T': False})
+                            # 判断是否为首尾
+                            temp['type'] = format_input['type']
+                            temp['sum'] = format_input['sum']
+                            temp['material'] = format_input['material']
+                            temp['thickness'] = format_input['thickness']
+                            temp['addr'] = format_input['addr']
+                            temp['list_num'] = format_input['list_num']
+                            temp['part_name'] = format_input['part_name']
+                            temp['pro_name'] = format_input['pro_name']
+                            temp['name'] = format_input['name'] + ',第' + str(j + 1) + '拼' + ',共' + str(int(math.pi / 2 / angle + 1)) + '拼'
+                            temp['remark'] = temp['name']
+                            ping.append(temp)
+                            start = start + div
+                        format_input.update({'ping': ping})
+                    # 整圆
+                    elif p2 != p2 or p2 == 0:
                         # 内直径为空
-                        # 加个判断，内外径的判断，如果文字写内径就把厚度
-                        p1 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p1))[0])
+                        p1 = float(findall('\d+\.\d+|\d+', str(p1))[0])
                         format_input['type'] = '整圆'
                         format_input['parameter'].update({'od': p1})
-                    elif part_name.find("接管") != -1 or ((str(p1).find("径") != -1 and str(p2).find("径") == -1)):
+
+                    # 接管
+                    elif part_name.find("接管") != -1 or part_name.find("筒") != -1 or ((str(p1).find("径") != -1 and str(p2).find("径") == -1)):
                         format_input['type'] = '接管'
-                        p1 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p1))[0])
-                        p2 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p2))[0])
-                        format_input['parameter'].update({'l': (p1 - thickness) * 3.1415926})
+                        p1 = float(findall('\d+\.\d+|\d+', str(p1))[0])
+                        p2 = float(findall('\d+\.\d+|\d+', str(p2))[0])
+                        format_input['parameter'].update({'w': (p1 - thickness) * 3.1415926})
+
                         # 判断是否拼接
                         if str(remark).find('拼') == -1:
-                            format_input['parameter'].update({'w': p2})
-                        else:
-                            weld_part = []
-                            for i in findall('[^\d]*(\d+)\.?[^\d]*', remark):
-                                weld_part.append(float(i))
-                            format_input['ping'] = []
-                            for i in range(len(weld_part)):
-                                p = {}
-                                p['parameter'] = {}
-                                p['parameter'].update({'l': (p1 - thickness) * 3.1415926})
-                                p['parameter'].update({'w': weld_part[i]})
-                                p['type'] = '接管'
-                                p['thickness'] = thickness
-                                p['material'] = str(material)
-                                p['sum'] = sum_num
-                                p['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(
-                                    p['sum']) + '第' + str(i + 1) + '拼，共' + str(len(weld_part)) + '拼'
-                                format_input['ping'].append(p)
+                            format_input['parameter'].update({'l': p2})
 
-                    elif part_name.find("环") != -1 or part_name.find("B板") != -1 or (
-                            str(p1).find("径") != -1 and str(p2).find("径") != -1) or (
+                        else:
+                            format_input['ping'] = SolvePing.pin(p1, p2, format_input)
+
+
+
+                    elif part_name.find("环") != -1 or (str(p1).find("径") != -1 and str(p2).find("径") != -1) or (
                             str(p1).find("φ") != -1 and str(p2).find("φ") != -1):
-                        p1 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p1))[0])
-                        p2 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p2))[0])
+                        p1 = float(findall('\d+\.\d+|\d+', str(p1))[0])
+                        p2 = float(findall('\d+\.\d+|\d+', str(p2))[0])
                         format_input['type'] = '圆环'
+
                         format_input['parameter'].update({'od': p1})
                         format_input['parameter'].update({'id': p2})
                         if str(remark).find('拼') != -1:
-                            i = findall('[^\d]*(\d+)[^\d]*', remark)
-                            if i:
-                                degree = 360 / int(i[0])
-                                format_input['sum'] = format_input['sum'] * int(i[0])
-                            format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(
-                                int(i[0])) + '拼_' + str(format_input['sum'])
-                            format_input['parameter'].update({'angle': degree})
-                    # 判断是否为弧板
-                    elif part_name.find('HB') != -1:
+                            format_input['ping'] = SolvePing.pin(p1, p2, format_input)
 
-                        p1 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p1))[0])
-                        p2 = float(findall('[^\d]*(\d+)\.?[^\d]*', str(p2))[0])
-                        angle = float(findall('[^\d]*(\d+)\.?[^\d]*', str(remark))[0])
+
+
+                    # 判断是否为弧板
+                    elif str(remark).find('°') != -1:
+
+                        p1 = float(findall('\d+\.\d+|\d+', str(p1))[0])
+                        p2 = float(findall('\d+\.\d+|\d+', str(p2))[0])
+                        angle = float(findall('(\d+\.\d+|\d+)°', str(remark))[0])
                         format_input['type'] = '弧板'
 
-                        if thickness <= 80:
+                        if str(remark).find('卷') == -1:
                             format_input['parameter'].update({'od': (p1 + p2) * 2})
                             format_input['parameter'].update({'id': p1 * 2})
                             format_input['parameter'].update({'angle': angle})
                         else:
                             temp = format_input['sum']
-                            format_input['parameter'].update({'w': (p1 * 2 + p2) * 3.1415926})
-                            n = math.ceil(format_input['sum'] / math.floor(
-                                360 / float(re.findall('[^\d]*(\d+)\.?[^\d]*', remark)[0])))
-                            format_input['parameter'].update({'l': thickness * n})
+                            new_p1 = (p1 * 2 + p2) * 3.1415926
+                            n = math.ceil(format_input['sum'] / math.floor(360 / float(re.findall('\d+\.\d+|\d+', remark)[0])))
+                            new_p2 = thickness * n
+                            format_input['parameter'].update({'w': new_p1})
+                            format_input['parameter'].update({'l': new_p2})
                             format_input['thickness'] = float(p2)
+                            format_input['type'] = '接管'
                             format_input['sum'] = 1
-                            format_input['name'] = str(
-                                list_num) + '_' + pro_name + '_' + part_name + '_' + '一个接管可以做' + str(
-                                temp) + '件_' + str(format_input['sum'])
-                    else:
+                            format_input['name'] =str(format_input['addr'])+'_'+str(list_num) + '_' + str(pro_name) + '_' + str(part_name) + '_' + '(' + str(format_input['sum'])+')' + '一个接管可以做' + str(
+                                temp) + '件'
+                            if str(remark).find('拼') == -1:
+                                format_input['remark'] = format_input['name']
+                            else:
+                                format_input['ping'] = SolvePing.pin(new_p1, new_p2, format_input)
+
+
+                    else:  # 其余都作为搭板处理，如还不能处理则报错
                         format_input['type'] = '搭板'
+                        p1 = float(findall('\d+\.\d+|\d+', str(p1))[0])
+                        p2 = float(findall('\d+\.\d+|\d+', str(p2))[0])
                         format_input['parameter'].update({'w': p1})
                         format_input['parameter'].update({'l': p2})
+                        if str(remark).find('拼') != -1:
+                            format_input['ping'] = SolvePing.pin(p1, p2, format_input)
 
-                    # 除波纹管外的其他的类型提供parameter参数和name参数
-                    # if type(p2) == int or type(p1) == float:
-                    #     if p2 != 0:
-                    #         format_input['parameter'].append(p2)
 
-                    format_input['material'] = str(material)
-                    format_input['sum'] = mark_sum
-                    if mark_sum != pro_sum * sum_num:
-                        if mark_sum != mark_sum:
-                            format_input['sum'] = int(pro_sum * sum_num)
-                        else:
-                            format_input['sum'] = int(mark_sum)
-                            # print('请检查%s行数据是否异常'%list_num)
+
+            except Exception as e:
+                print(address+'序号'+str(list_num)+'行数据获取异常！！！')
+                print(e)
+                # temp=''
+                item = {}
+                item.update({'addr': address})
+                item.update({'list_num': list_num})
+                item.update({'pro_name': pro_name})
+                item.update({'part_name': part_name})
+                item.update({'sum': mark_sum})
+                item.update({'remark': remark})
+                item.update({'p1': p1})
+                item.update({'p2': p2})
+                try:
+                    item.update({'error': e.info})
+                    # temp=e.info+'\n'
+                except Exception:
+                    pass
+                # temp = temp+address.strip('\'').split('/')[-1]+'序号'+str(list_num)+'行数据获取异常！！！'
+                try:
+                    if e.filter:
+                        # self.filter.append(temp)
+                        self.filter.append(item)
                     else:
-                        format_input['sum'] = int(mark_sum)
-                    # print(list_num)
-                    format_input['name'] = str(list_num) + '_' + pro_name + '_' + part_name + '_' + str(
-                        format_input['sum'])
+                        # self.error.append(temp)
+                        self.error.append(item)
+                except Exception:
+                    # self.error.append(temp)
+                    self.error.append(item)
+                # print(temp)
+                continue
 
-                except BaseException:
-                    print('第' + str(list_num) + '行数据获取异常！！！')
-                    error = {}
-                    error["code"] = "002"
-                    error["content"] = '第' + str(list_num) + '行数据获取异常！！！'
-                    self.error_gather.append(error)
-                    continue
+            if 'ping' in format_input:
+                for i in format_input['ping']:
+                    self.output.append(i)
+                    # print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], i['sum'])
+            else:
+                self.output.append(format_input)
+                # print(format_input['name'], format_input['type'], format_input['parameter'],format_input['material'], format_input['thickness'], format_input['sum'])
+        # for i in self.output:
+        #     if i['type'] == '弯头':
+        #         print(i['name'], i['type'], i['material'], i['thickness'], i['sum'])
+        #     else:
+        #         print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], i['sum'])
 
-                if 'ping' in format_input:
-                    for i in format_input['ping']:
-                        self.output.append(i)
-                        # print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], i['sum'])
-                else:
-                    self.output.append(format_input)
-                    # print(format_input['name'], format_input['type'], format_input['parameter'],
-                    #       format_input['material'], format_input['thickness'], format_input['sum'])
-# # 波纹管板材简算
-# global result_success,result_1219,result_1000,estimate_1219
-# result_success = '所有图形均已绘制完毕~'
-# print(result_success)
-# if bellows_weight_1219 != 0:
-#     result_1219 = '未绘制的波纹管所需板幅1219总重量为: %d kg' %bellows_weight_1219
-#     print(result_1219)
-# if bellows_weight_1000 != 0:
-#     result_1000 = '未绘制的波纹管所需板幅1000 总重量为: %d kg'%bellows_weight_1000
-#     print(result_1000)
-#     estimate_1219 = '均使用板幅1219所需重量:%d kg' %(bellows_weight_1000*1.22+bellows_weight_1219)
-#     print(estimate_1219)
+if __name__ == '__main__':
+    g = GetExcelInfo('MM-2109C  0-0.xlsx')
+    print(g.output[0])

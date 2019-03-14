@@ -29,7 +29,10 @@ def size_info(parameter):
         size = '外直径: ' + str(parameter['od']) + ' 内直径: ' + str(parameter['id']) + ' 弧度: ' + str(parameter['angle'])
         return size
     elif 'w' in parameter and 'l' in parameter:
-        size = '长度: ' + str(int(parameter['l']) + 1) + ' 宽度: ' + str(parameter['w'])
+        if int(parameter['l']) > parameter['w']:
+            size = '长度: ' + str(int(parameter['l']) + 1) + ' 宽度: ' + str(int(parameter['w']))
+        else:
+            size = '长度: ' + str(int(parameter['w'])) + ' 宽度: ' + str(int(parameter['l']) + 1)
         return size
 
     else:
@@ -119,7 +122,7 @@ def OutputDocx(info,address):
         table.cell(y + 2, 0).paragraphs[0].paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
         table.cell(y + 2, 0).vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         #设置每一行的单元格的内容
-        table.cell(y + 2, 1).text = str(list['product_code'])
+        table.cell(y + 2, 1).text = str(list['pro_name'])
         table.cell(y + 2, 2).text = str(list['part_name'])
         table.cell(y + 2, 3).text = str(list['material'])
         table.cell(y + 2, 4).text = str(list['thickness'])
@@ -165,6 +168,7 @@ def OutputDocx(info,address):
     doc.sections[0].top_margin = Mm(18)
     doc.sections[0].bottom_margin = Mm(15)
     #文件保存
+    print(addr +'\\' + table_title + u'_结构件下料清单.docx')
     doc.save(addr +'\\' + table_title + u'_结构件下料清单.docx')
     table_finish = '文件已生成'
     print(table_finish)
