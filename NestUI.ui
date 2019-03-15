@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="toolTip">
+   <string/>
+  </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
@@ -60,6 +63,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="pushButton_select">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;输入规定格式的EXCEL表格&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>选择文件</string>
       </property>
@@ -67,6 +73,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="pushButton_dxf">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;根据EXCEL表格中数据生成CAD格式（DXF）的文件&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>生成dxf</string>
       </property>
@@ -74,6 +83,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="pushButton_Docx">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;生成标准化下料清单&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>生成下料清单</string>
       </property>
@@ -81,6 +93,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="pushButton_summarize">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;将相同厚度DXF文件汇总至一个文件夹&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>文件汇总</string>
       </property>
@@ -89,7 +104,7 @@
     <item>
      <widget class="QPushButton" name="pushButton_clear">
       <property name="text">
-       <string>Clear</string>
+       <string>清除</string>
       </property>
      </widget>
     </item>
