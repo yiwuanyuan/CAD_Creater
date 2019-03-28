@@ -12,17 +12,16 @@ class MyWindow(QtWidgets.QWidget,Ui_Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setFixedSize(1290, 761)
         self.infoTable.setColumnWidth(0,100)
         self.infoTable.setColumnWidth(1,40)
         self.infoTable.setColumnWidth(2,100)
         self.infoTable.setColumnWidth(3,100)
         self.infoTable.setColumnWidth(4,100)
-        self.infoTable.setColumnWidth(5,100)
-        self.infoTable.setColumnWidth(6,100)
+        self.infoTable.setColumnWidth(5,80)
+        self.infoTable.setColumnWidth(6,80)
         self.infoTable.setColumnWidth(7,50)
         self.infoTable.setColumnWidth(8,50)
-        self.infoTable.setColumnWidth(9,300)
+        self.infoTable.setColumnWidth(9,100)
         self.infoTable.verticalHeader().setVisible(False)
         self.infoTable.setAlternatingRowColors(True)
         self.filterTable.setColumnWidth(0, 100)
@@ -46,6 +45,7 @@ class MyWindow(QtWidgets.QWidget,Ui_Form):
 
         self.dxf_addr = ''
         self.addrs=[]
+
         # 成员变量初始化
 
     def summarize(self):
@@ -259,6 +259,7 @@ class MyWindow(QtWidgets.QWidget,Ui_Form):
 
     #新增加
     def letDocxWork(self):
+
         if len(self.addrs) != 0:
             flag = True
             rowCountInfo = 0
@@ -287,7 +288,7 @@ class MyWindow(QtWidgets.QWidget,Ui_Form):
                     info = g.output
 
                     try:
-                        OutputDocx(info, ad)
+                        OutputDocx(info, ad,self.isNeedMaterialList.isChecked())
                     except Exception as e:
                         temp = {}
                         try:
@@ -307,6 +308,11 @@ class MyWindow(QtWidgets.QWidget,Ui_Form):
                 QMessageBox.warning(self, "提示", "所有excel已解析完毕")
         else:
             QMessageBox.warning(self, "提示", "至少选择一个Excel文件")
+
+    def helpInfo(self):
+        pass
+
+
 
 if __name__ =='__main__':
     app = QApplication(sys.argv)
