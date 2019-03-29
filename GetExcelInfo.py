@@ -16,7 +16,6 @@ def a2r(angle):
     return angle / 180 * math.pi
 
 
-
 class GetExcelInfo:
 
     def __init__(self, address):
@@ -28,7 +27,7 @@ class GetExcelInfo:
         print(address)
         # 判断模板Excel的类型
 
-        #新增加判断模板类型
+        # 新增加判断模板类型
         try:
             if address.find('排料清单') != -1:
                 inform = InfoPro(address).form_out
@@ -40,7 +39,7 @@ class GetExcelInfo:
             self.error.push(temp)
             print(temp)
 
-        address = re.findall('(.*).xlsx',address.split('/')[-1])[0]
+        address = re.findall('(.*).xlsx', address.split('/')[-1])[0]
         # 地址信息简化（只保留文件名）
 
         for line in inform:
@@ -100,9 +99,10 @@ class GetExcelInfo:
                     format_input['sum'] = mark_sum
                     format_input['material'] = str(material)
                     format_input['thickness'] = thickness
-                    #王元修改
+                    # 王元修改
                     if format_input['addr'].find('排料清单') != -1:
-                        format_input['name'] =str(list_num) + '_' + str(pro_name) + '_' + str(part_name) + '(' + str(format_input['sum'])+')'
+                        format_input['name'] = str(list_num) + '_' + str(pro_name) + '_' + str(part_name) + '(' + str(
+                            format_input['sum']) + ')'
                     else:
                         format_input['name'] = str(format_input['addr']) + '_' + str(list_num) + '_' + str(
                             pro_name) + '_' + str(part_name) + '(' + str(format_input['sum']) + ')'
@@ -141,7 +141,8 @@ class GetExcelInfo:
                             temp['list_num'] = format_input['list_num']
                             temp['part_name'] = format_input['part_name']
                             temp['pro_name'] = format_input['pro_name']
-                            temp['name'] = format_input['name'] + ',第' + str(j + 1) + '拼' + ',共' + str(int(math.pi / 2 / angle + 1)) + '拼'
+                            temp['name'] = format_input['name'] + ',第' + str(j + 1) + '拼' + ',共' + str(
+                                int(math.pi / 2 / angle + 1)) + '拼'
                             temp['remark'] = temp['name']
                             ping.append(temp)
                             start = start + div
@@ -154,7 +155,8 @@ class GetExcelInfo:
                         format_input['parameter'].update({'od': p1})
 
                     # 接管
-                    elif part_name.find("接管") != -1 or part_name.find("筒") != -1 or ((str(p1).find("径") != -1 and str(p2).find("径") == -1)):
+                    elif part_name.find("接管") != -1 or part_name.find("筒") != -1 or (
+                    (str(p1).find("径") != -1 and str(p2).find("径") == -1)):
                         format_input['type'] = '接管'
                         p1 = float(findall('\d+\.\d+|\d+', str(p1))[0])
                         p2 = float(findall('\d+\.\d+|\d+', str(p2))[0])
@@ -197,14 +199,17 @@ class GetExcelInfo:
                         else:
                             temp = format_input['sum']
                             new_p1 = (p1 * 2 + p2) * 3.1415926
-                            n = math.ceil(format_input['sum'] / math.floor(360 / float(re.findall('\d+\.\d+|\d+', remark)[0])))
+                            n = math.ceil(
+                                format_input['sum'] / math.floor(360 / float(re.findall('\d+\.\d+|\d+', remark)[0])))
                             new_p2 = thickness * n
                             format_input['parameter'].update({'w': new_p1})
                             format_input['parameter'].update({'l': new_p2})
                             format_input['thickness'] = float(p2)
                             format_input['type'] = '接管'
                             format_input['sum'] = 1
-                            format_input['name'] =str(format_input['addr'])+'_'+str(list_num) + '_' + str(pro_name) + '_' + str(part_name) + '_' + '(' + str(format_input['sum'])+')' + '一个接管可以做' + str(
+                            format_input['name'] = str(format_input['addr']) + '_' + str(list_num) + '_' + str(
+                                pro_name) + '_' + str(part_name) + '_' + '(' + str(
+                                format_input['sum']) + ')' + '一个接管可以做' + str(
                                 temp) + '件'
                             if str(remark).find('拼') == -1:
                                 format_input['remark'] = format_input['name']
@@ -224,7 +229,7 @@ class GetExcelInfo:
 
 
             except Exception as e:
-                print(address+'序号'+str(list_num)+'行数据获取异常！！！')
+                print(address + '序号' + str(list_num) + '行数据获取异常！！！')
                 print(e)
                 # temp=''
                 item = {}
@@ -267,6 +272,7 @@ class GetExcelInfo:
         #         print(i['name'], i['type'], i['material'], i['thickness'], i['sum'])
         #     else:
         #         print(i['name'], i['type'], i['parameter'], i['material'], i['thickness'], i['sum'])
+
 
 if __name__ == '__main__':
     g = GetExcelInfo('MM-2109C  0-0.xlsx')
